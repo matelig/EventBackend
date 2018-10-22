@@ -55,6 +55,23 @@ public class AuthEndpoint {
 
     }
 
+    @Path("/test2")
+    @GET
+    public void tokenRequest() {
+        try {
+            OAuthClientRequest request = OAuthClientRequest.tokenLocation(this.url.toString() + "api/token").setGrantType(GrantType.PASSWORD).setClientId(Common.CLIENT_ID).setClientSecret(Common.CLIENT_SECRET).setUsername(Common.USERNAME).setPassword(Common.PASSWORD).buildBodyMessage();
+            OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
+            OAuthAccessTokenResponse oauthResponse = oAuthClient.accessToken(request);
+            System.out.println(oauthResponse.getAccessToken());
+            System.out.println(oauthResponse.getExpiresIn());
+        } catch (OAuthSystemException var4) {
+            var4.printStackTrace();
+        } catch (OAuthProblemException var5) {
+            var5.printStackTrace();
+        }
+
+    }
+
     private Response makeRequest() throws OAuthSystemException, URISyntaxException {
         OAuthClientRequest request = OAuthClientRequest
                 .authorizationLocation(url.toString() + "api/auth")
