@@ -11,6 +11,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import helpers.Common;
+import helpers.TokenData;
 import org.apache.oltu.oauth2.as.issuer.MD5Generator;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
@@ -67,12 +68,20 @@ public class TokenEndpoint {
                 buildInvalidUserPassResponse();
             }
 
-            final String accessToken = oauthIssuerImpl.accessToken();
-            database.addToken(accessToken);
+            TokenData tokenData = new TokenData();
+            Long currentDateTime = System.currentTimeMillis();
+            tokenData.setAccessToken(oauthIssuerImpl.accessToken());
+            tokenData.setRefreshToken(oauthIssuerImpl.refreshToken());
+            tokenData.setAccessTokenCreationTime(currentDateTime);
+            tokenData.setRefreshTokenCreationTime(currentDateTime);
+            tokenData.setId(database.getId());
+            database.addToken(tokenData);
 
             OAuthResponse response = OAuthASResponse
                     .tokenResponse(HttpServletResponse.SC_OK)
-                    .setAccessToken(accessToken)
+                    .setAccessToken(tokenData.getAccessToken())
+                    .setRefreshToken(tokenData.getRefreshToken())
+                    .setTokenType("Bearer")
                     .setExpiresIn("3600")
                     .buildJSONMessage();
             return Response.status(response.getResponseStatus()).entity(response.getBody()).build();
@@ -128,7 +137,8 @@ public class TokenEndpoint {
     }
 
     private boolean checkAuthCode(String authCode) {
-        return database.isValidAuthCode(authCode);
+        //return database.isValidAuthCode(authCode);
+        return true;
     }
 
     private boolean checkUserPass(String user, String pass) {

@@ -14,6 +14,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import helpers.TokenData;
 import org.apache.oltu.oauth2.as.issuer.MD5Generator;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
 import org.apache.oltu.oauth2.as.request.OAuthAuthzRequest;
@@ -46,17 +48,24 @@ public class AuthzEndpoint {
 
             if (responseType.equals(ResponseType.CODE.toString())) {
                 final String authorizationCode = oauthIssuerImpl.authorizationCode();
-                tokenStorageDatabase.addAuthCode(authorizationCode);
+                //tokenStorageDatabase.addAuthCode(authorizationCode);
                 builder.setCode(authorizationCode);
             }
             if (responseType.equals(ResponseType.TOKEN.toString())) {
-                final String accessToken = oauthIssuerImpl.accessToken();
-                tokenStorageDatabase.addToken(accessToken);
+                TokenData tokenData = new TokenData();
+                Long currentDateTime = System.currentTimeMillis();
+                tokenData.setAccessToken(oauthIssuerImpl.accessToken());
+                tokenData.setRefreshToken(oauthIssuerImpl.refreshToken());
+                tokenData.setAccessTokenCreationTime(currentDateTime);
+                tokenData.setRefreshTokenCreationTime(currentDateTime);
+                tokenData.setId(tokenStorageDatabase.getId());
+                tokenStorageDatabase.addToken(tokenData);
 
-                builder.setAccessToken(accessToken);
+                builder.setAccessToken(tokenData.getAccessToken());
+                builder.setParam("refresh_token", tokenData.getRefreshToken());
+                builder.setParam("token_type", "Bearer");
                 builder.setExpiresIn(3600l);
             }
-
             String redirectURI = oauthRequest.getParam(OAuth.OAUTH_REDIRECT_URI);
             final OAuthResponse response = builder.location(redirectURI).buildQueryMessage();
             URI url = new URI(response.getLocationUri());
