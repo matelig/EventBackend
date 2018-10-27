@@ -11,7 +11,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import helpers.Common;
+import helpers.KeysCoder;
 import helpers.TokenData;
+import io.jsonwebtoken.Jwts;
+import javafx.scene.input.KeyCode;
 import org.apache.oltu.oauth2.as.issuer.MD5Generator;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
@@ -43,7 +46,6 @@ public class AccessTokenEndpoint {
     public Response authorize(@Context HttpServletRequest request) throws OAuthSystemException {
         try {
             OAuthTokenRequest oauthRequest = new OAuthTokenRequest(request);
-            OAuthIssuer oauthIssuerImpl = new OAuthIssuerImpl(new UUIDValueGenerator());
 
             // check if clientid is valid
             if (!checkClientId(oauthRequest.getClientId())) {
@@ -69,10 +71,11 @@ public class AccessTokenEndpoint {
                 buildInvalidUserPassResponse();
             }
 
+
             TokenData tokenData = new TokenData();
             Long currentDateTime = System.currentTimeMillis();
-            tokenData.setAccessToken(oauthIssuerImpl.accessToken());
-            tokenData.setRefreshToken(oauthIssuerImpl.refreshToken());
+            tokenData.setAccessToken(KeysCoder.shared.generateAccessToken(oauthRequest.getUsername()));
+            tokenData.setRefreshToken(KeysCoder.shared.generateRefreshToken());
             tokenData.setAccessTokenCreationTime(currentDateTime);
             tokenData.setRefreshTokenCreationTime(currentDateTime);
             tokenData.setId(database.getId());

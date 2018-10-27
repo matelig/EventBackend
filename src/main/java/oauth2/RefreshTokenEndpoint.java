@@ -1,16 +1,13 @@
 package oauth2;
 
 import helpers.Common;
+import helpers.KeysCoder;
 import helpers.TokenData;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
 import org.apache.oltu.oauth2.as.issuer.UUIDValueGenerator;
 import org.apache.oltu.oauth2.as.request.OAuthTokenRequest;
 import org.apache.oltu.oauth2.as.response.OAuthASResponse;
-import org.apache.oltu.oauth2.client.OAuthClient;
-import org.apache.oltu.oauth2.client.URLConnectionClient;
-import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
-import org.apache.oltu.oauth2.client.response.OAuthAccessTokenResponse;
 import org.apache.oltu.oauth2.common.OAuth;
 import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
@@ -65,11 +62,12 @@ public class RefreshTokenEndpoint {
             if (tokenData == null) {
                 return Response.status(401).build();
             }
-
+            //decode tokenData.getAccessToken() to extract user email
+            String username = KeysCoder.shared.decodeAccessToken(tokenData.getAccessToken());
             Long currentDateTime = System.currentTimeMillis();
 
-            tokenData.setAccessToken(oauthIssuerImpl.accessToken());
-            tokenData.setRefreshToken(oauthIssuerImpl.refreshToken());
+            tokenData.setAccessToken(KeysCoder.shared.generateAccessToken(username));
+            tokenData.setRefreshToken(KeysCoder.shared.generateRefreshToken());
             tokenData.setAccessTokenCreationTime(currentDateTime);
             tokenData.setRefreshTokenCreationTime(currentDateTime);
 
