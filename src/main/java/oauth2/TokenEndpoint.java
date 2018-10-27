@@ -15,6 +15,7 @@ import helpers.TokenData;
 import org.apache.oltu.oauth2.as.issuer.MD5Generator;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
+import org.apache.oltu.oauth2.as.issuer.UUIDValueGenerator;
 import org.apache.oltu.oauth2.as.request.OAuthTokenRequest;
 import org.apache.oltu.oauth2.as.response.OAuthASResponse;
 import org.apache.oltu.oauth2.common.OAuth;
@@ -42,7 +43,7 @@ public class TokenEndpoint {
     public Response authorize(@Context HttpServletRequest request) throws OAuthSystemException {
         try {
             OAuthTokenRequest oauthRequest = new OAuthTokenRequest(request);
-            OAuthIssuer oauthIssuerImpl = new OAuthIssuerImpl(new MD5Generator());
+            OAuthIssuer oauthIssuerImpl = new OAuthIssuerImpl(new UUIDValueGenerator());
 
             // check if clientid is valid
             if (!checkClientId(oauthRequest.getClientId())) {

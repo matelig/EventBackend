@@ -1,6 +1,8 @@
 package controllers;
 
 import helpers.Common;
+import jdk.nashorn.internal.parser.Token;
+import model.TokenRequest;
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
 import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
@@ -8,106 +10,55 @@ import org.apache.oltu.oauth2.client.response.OAuthAccessTokenResponse;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
-import org.apache.oltu.oauth2.common.message.types.ResponseType;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-import org.glassfish.jersey.client.JerseyClientBuilder;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jettison.json.JSONArray;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.IOException;
 
 @Path("/test")
 public class AuthEndpoint {
 
     private String url = "http://localhost:8080/EventBackend/";
-    private Client client = JerseyClientBuilder.newClient();
-
-    @Path("/test")
-    @GET
-    public void directTokenRequest() {
-        OAuthClientRequest request = null;
-        try {
-            Response response = makeRequest();
-            String authCode = getAuthCode(response);
-            OAuthAccessTokenResponse oauthResponse = makeTokenRequestWithAuthCode(authCode);
-            System.out.println(oauthResponse.getAccessToken());
-            System.out.println(oauthResponse.getExpiresIn());
-            System.out.println(oauthResponse.getRefreshToken());
-            System.out.println(oauthResponse.getTokenType());
-
-        } catch (OAuthSystemException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (OAuthProblemException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     @Path("/test2")
-    @GET
-    public void tokenRequest() {
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public JsonObject tokenRequest(String tokenRequestString) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        TokenRequest tokenRequest = mapper.readValue(tokenRequestString, TokenRequest.class);
         try {
-            OAuthClientRequest request = OAuthClientRequest.tokenLocation(this.url.toString() + "api/token").setGrantType(GrantType.PASSWORD).setClientId(Common.CLIENT_ID).setClientSecret(Common.CLIENT_SECRET).setUsername(Common.USERNAME).setPassword(Common.PASSWORD).buildBodyMessage();
+            OAuthClientRequest request = OAuthClientRequest.tokenLocation(
+                    this.url + "api/token")
+                    .setGrantType(GrantType.valueOf(tokenRequest.getGrantType().toUpperCase()))
+                    .setClientId(tokenRequest.getClientId())
+                    .setClientSecret(tokenRequest.getClientSecret())
+                    .setUsername(tokenRequest.getEmail())
+                    .setPassword(tokenRequest.getPassword()).buildBodyMessage();
             OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
             OAuthAccessTokenResponse oauthResponse = oAuthClient.accessToken(request);
             System.out.println(oauthResponse.getAccessToken());
             System.out.println(oauthResponse.getExpiresIn());
+            JsonObjectBuilder json = Json.createObjectBuilder();
+            json.add("access_token", oauthResponse.getAccessToken());
+            json.add("refresh_token", oauthResponse.getRefreshToken());
+            json.add("expires_in", oauthResponse.getExpiresIn());
+            json.add("token_type", oauthResponse.getTokenType());
+            return json.build();
         } catch (OAuthSystemException var4) {
             var4.printStackTrace();
+            return null;
         } catch (OAuthProblemException var5) {
             var5.printStackTrace();
+            return null;
         }
-
-    }
-
-    private Response makeRequest() throws OAuthSystemException, URISyntaxException {
-        OAuthClientRequest request = OAuthClientRequest
-                .authorizationLocation(url.toString() + "api/auth")
-                .setClientId(Common.CLIENT_ID)
-                .setRedirectURI(url.toString() + "api/redirect")
-                .setResponseType(ResponseType.CODE.toString())
-                .setState("state")
-                .buildQueryMessage();
-        WebTarget target = client.target(new URI(request.getLocationUri()));
-        Response response = target.request(MediaType.TEXT_HTML).get();
-        return response;
-    }
-
-    private String getAuthCode(Response response) throws JSONException {
-        JSONObject obj = new JSONObject(response.readEntity(String.class));
-        JSONObject qp = obj.getJSONObject("queryParameters");
-        String authCode = null;
-        if (qp != null) {
-            authCode = qp.getString("code");
-        }
-
-        return authCode;
-    }
-
-    private OAuthAccessTokenResponse makeTokenRequestWithAuthCode(String authCode) throws OAuthProblemException, OAuthSystemException {
-        OAuthClientRequest request = OAuthClientRequest
-                .tokenLocation(url + "api/token")
-                .setClientId(Common.CLIENT_ID)
-                .setClientSecret(Common.CLIENT_SECRET)
-                .setGrantType(GrantType.AUTHORIZATION_CODE)
-                .setCode(authCode)
-                .setRedirectURI(url + "api/redirect")
-                .buildBodyMessage();
-        OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
-        OAuthAccessTokenResponse oauthResponse = oAuthClient.accessToken(request);
-        return oauthResponse;
     }
 
 }
