@@ -14,13 +14,16 @@ public class TokenRequest {
     private String password;
     @JsonProperty(value = "grant_type")
     private String grantType;
+    @JsonProperty(value = "refresh_token")
+    private String refreshToken;
 
-    public TokenRequest(String clientId, String clientSecret, String email, String password, String grantType) {
+    public TokenRequest(String clientId, String clientSecret, String email, String password, String grantType, String refreshToken) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.email = email;
         this.password = password;
         this.grantType = grantType;
+        this.refreshToken = refreshToken;
     }
 
     public TokenRequest() {
@@ -59,5 +62,13 @@ public class TokenRequest {
     }
     public void setGrantType(String grantType) {
         this.grantType = grantType;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

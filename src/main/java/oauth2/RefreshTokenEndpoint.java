@@ -1,18 +1,8 @@
 package oauth2;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-
 import helpers.Common;
+import helpers.KeysCoder;
 import helpers.TokenData;
-import org.apache.oltu.oauth2.as.issuer.MD5Generator;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
 import org.apache.oltu.oauth2.as.issuer.UUIDValueGenerator;
@@ -25,13 +15,21 @@ import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 
-/**
- *
- *
- *
- */
-@Path("/token")
-public class TokenEndpoint {
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+
+@Path("/refreshToken")
+public class RefreshTokenEndpoint {
+
+    private String url = "http://localhost:8080/EventBackend/";
+
     @Inject
     private TokenStorageDatabase database;
 
@@ -55,28 +53,23 @@ public class TokenEndpoint {
                 return buildInvalidClientSecretResponse();
             }
 
-            // do checking for different grant types
-            if (oauthRequest.getParam(OAuth.OAUTH_GRANT_TYPE).equals(GrantType.AUTHORIZATION_CODE.toString())) {
-                if (!checkAuthCode(oauthRequest.getParam(OAuth.OAUTH_CODE))) {
-                    return buildBadAuthCodeResponse();
-                }
-            } else if (oauthRequest.getParam(OAuth.OAUTH_GRANT_TYPE).equals(GrantType.PASSWORD.toString())) {
-                if (!checkUserPass(oauthRequest.getUsername(), oauthRequest.getPassword())) {
-                    return buildInvalidUserPassResponse();
-                }
-            } else if (oauthRequest.getParam(OAuth.OAUTH_GRANT_TYPE).equals(GrantType.REFRESH_TOKEN.toString())) {
+            if (!oauthRequest.getParam(OAuth.OAUTH_GRANT_TYPE).equals(GrantType.REFRESH_TOKEN.toString())) {
                 // refresh token is not supported in this implementation
-                buildInvalidUserPassResponse();
+                return buildInvalidUserPassResponse();
             }
+            TokenData tokenData = database.getTokenData(oauthRequest.getRefreshToken());
 
-            TokenData tokenData = new TokenData();
+            if (tokenData == null) {
+                return Response.status(401).build();
+            }
+            //decode tokenData.getAccessToken() to extract user email
+            String username = KeysCoder.shared.decodeAccessToken(tokenData.getAccessToken());
             Long currentDateTime = System.currentTimeMillis();
-            tokenData.setAccessToken(oauthIssuerImpl.accessToken());
-            tokenData.setRefreshToken(oauthIssuerImpl.refreshToken());
+
+            tokenData.setAccessToken(KeysCoder.shared.generateAccessToken(username));
+            tokenData.setRefreshToken(KeysCoder.shared.generateRefreshToken());
             tokenData.setAccessTokenCreationTime(currentDateTime);
             tokenData.setRefreshTokenCreationTime(currentDateTime);
-            tokenData.setId(database.getId());
-            database.addToken(tokenData);
 
             OAuthResponse response = OAuthASResponse
                     .tokenResponse(HttpServletResponse.SC_OK)
