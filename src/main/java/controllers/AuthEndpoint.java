@@ -1,7 +1,6 @@
 package controllers;
 
 import helpers.Common;
-import jdk.nashorn.internal.parser.Token;
 import model.TokenRequest;
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
