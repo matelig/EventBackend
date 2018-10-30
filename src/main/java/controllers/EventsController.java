@@ -35,7 +35,7 @@ public class EventsController {
     @GET
     @Produces("application/json")
     public JsonArray databaseTest() {
-        DatabaseConnection dbConnection = new DatabaseConnection("admin1", "admin1", "test", "localhost", "admin");
+        DatabaseConnection dbConnection = new DatabaseConnection("admin1", "ch0w4jmyN4523d4n3", "test", "80.211.62.201", "admin");
         MongoDatabase db = dbConnection.getDatabase();
         MongoCollection<Document> collection = db.getCollection("test");
         Document doc = new Document("name", "MongoDB")
