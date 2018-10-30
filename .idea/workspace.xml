@@ -7,64 +7,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9c370f48-81e2-4316-b5bc-144fb310d689" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/helpers/KeysCoder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/oauth2/RefreshTokenEndpoint.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/controllers/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controllers/Application.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/controllers/AuthEndpoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controllers/AuthEndpoint.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/helpers/Common.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/helpers/Common.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/model/TokenRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/TokenRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/oauth2/TokenEndpoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/oauth2/AccessTokenEndpoint.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/oauth2/TokenStorageDatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/oauth2/TokenStorageDatabase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/META-INF/MANIFEST.MF" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/beans.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/classes/controllers/Application.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/classes/controllers/AuthEndpoint.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/EventBackend/WEB-INF/classes/controllers/AuthEndpoint.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/classes/controllers/EventsController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/classes/controllers/HelloServlet.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/classes/database/DatabaseConnection.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/classes/helpers/Common.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/classes/helpers/TokenData.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/classes/model/TokenRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/classes/oauth2/AuthzEndpoint.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/classes/oauth2/RedirectEndpoint.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/classes/oauth2/TokenEndpoint.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/classes/oauth2/TokenStorageDatabase.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/activation-1.1.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/commons-codec-1.9.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/jackson-core-asl-1.9.13.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/jackson-jaxrs-1.9.13.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/jackson-mapper-asl-1.9.13.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/jackson-xc-1.9.13.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/javaee-api-7.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/javax.annotation-api-1.2.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/javax.inject-2.5.0-b42.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/javax.mail-1.5.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/javax.ws.rs-api-2.1.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/jersey-client-2.27.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/jersey-common-2.27.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/jersey-media-json-jackson1-2.23.1.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/jettison-1.4.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/json-20140107.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/org.apache.oltu.oauth2.authzserver-1.0.2.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/org.apache.oltu.oauth2.client-1.0.2.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/org.apache.oltu.oauth2.common-1.0.2.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/org.apache.oltu.oauth2.resourceserver-1.0.2.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/osgi-resource-locator-1.0.1.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/EventBackend/WEB-INF/lib/slf4j-api-1.7.7.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/controllers/Application.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/controllers/AuthEndpoint.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controllers/AuthEndpoint.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/controllers/EventsController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/controllers/HelloServlet.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/database/DatabaseConnection.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/helpers/Common.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/helpers/TokenData.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/model/TokenRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/oauth2/AuthzEndpoint.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/oauth2/RedirectEndpoint.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/oauth2/TokenEndpoint.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/oauth2/TokenStorageDatabase.class" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="SHOW_DIALOG" value="false" />
@@ -147,7 +91,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/controllers/EventsController.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="459">
-              <caret line="49" column="5" lean-forward="true" selection-start-line="49" selection-start-column="5" selection-end-line="49" selection-end-column="5" />
+              <caret line="40" column="54" lean-forward="true" selection-start-line="40" selection-start-column="54" selection-end-line="40" selection-end-column="54" />
             </state>
           </provider>
         </entry>
@@ -156,7 +100,7 @@
         <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="327">
-              <caret line="604" column="82" lean-forward="true" selection-start-line="604" selection-start-column="82" selection-end-line="604" selection-end-column="82" />
+              <caret line="653" column="16" lean-forward="true" selection-start-line="653" selection-start-column="16" selection-end-line="653" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -218,7 +162,6 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/main/java/controllers/HelloServlet.java" />
-        <option value="$PROJECT_DIR$/src/main/java/controllers/EventsController.java" />
         <option value="$PROJECT_DIR$/src/main/java/oauth2/RedirectEndpoint.java" />
         <option value="$PROJECT_DIR$/src/main/java/oauth2/TokenRequest.java" />
         <option value="$PROJECT_DIR$/src/main/java/oauth2/AuthzEndpoint.java" />
@@ -238,6 +181,7 @@
         <option value="$PROJECT_DIR$/src/main/java/helpers/KeysCoder.java" />
         <option value="$PROJECT_DIR$/src/main/java/controllers/AuthEndpoint.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/controllers/EventsController.java" />
       </list>
     </option>
   </component>
@@ -351,7 +295,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1540917092061" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1540917233114" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -461,11 +405,10 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="516000" />
+    <option name="totallyTimeSpent" value="809000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.8083067" visible="true" weight="0.19349681" />
       <window_info id="Structure" order="1" sideWeight="0.50107294" side_tool="true" weight="0.18656716" />
@@ -626,7 +569,7 @@
     <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="327">
-          <caret line="604" column="82" lean-forward="true" selection-start-line="604" selection-start-column="82" selection-end-line="604" selection-end-column="82" />
+          <caret line="653" column="16" lean-forward="true" selection-start-line="653" selection-start-column="16" selection-end-line="653" selection-end-column="16" />
         </state>
       </provider>
     </entry>
@@ -650,7 +593,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/controllers/EventsController.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="459">
-          <caret line="49" column="5" lean-forward="true" selection-start-line="49" selection-start-column="5" selection-end-line="49" selection-end-column="5" />
+          <caret line="40" column="54" lean-forward="true" selection-start-line="40" selection-start-column="54" selection-end-line="40" selection-end-column="54" />
         </state>
       </provider>
     </entry>
