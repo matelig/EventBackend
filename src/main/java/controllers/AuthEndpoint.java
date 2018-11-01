@@ -1,5 +1,6 @@
 package controllers;
 
+import helpers.Config;
 import model.TokenRequest;
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
@@ -22,8 +23,6 @@ import java.io.IOException;
 @Path("/authorization")
 public class AuthEndpoint {
 
-    private String url = "http://80.211.62.201:8080/AuthorizationServer/";
-
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response tokenRequest(String tokenRequestString) throws IOException {
@@ -41,7 +40,7 @@ public class AuthEndpoint {
     private Response returnAccessTokenResponse(TokenRequest tokenRequest) {
         try {
             OAuthClientRequest request = OAuthClientRequest.tokenLocation(
-                    this.url + "accessToken")
+                    Config.authorizationUrl + "accessToken")
                     .setGrantType(GrantType.PASSWORD)
                     .setClientId(tokenRequest.getClientId())
                     .setClientSecret(tokenRequest.getClientSecret())
@@ -69,7 +68,7 @@ public class AuthEndpoint {
     private Response returnRefreshTokenResponse(TokenRequest tokenRequest) {
         try {
             OAuthClientRequest request = OAuthClientRequest.tokenLocation(
-                    this.url + "refreshToken")
+                    Config.authorizationUrl + "refreshToken")
                     .setGrantType(GrantType.REFRESH_TOKEN)
                     .setClientId(tokenRequest.getClientId())
                     .setClientSecret(tokenRequest.getClientSecret())
