@@ -4,15 +4,27 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.CreateCollectionOptions;
 import database.DatabaseConnection;
+import helpers.Config;
 import org.bson.Document;
+import org.glassfish.jersey.client.JerseyClientBuilder;
 
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
+import javax.print.attribute.standard.Media;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 
 @Path("/events")
@@ -48,4 +60,15 @@ public class EventsController {
         builder.add(Json.createObjectBuilder().add("first", collection.find().first().toJson()));
         return builder.build();
     }
+
+    @Path("/authTest")
+    @GET
+    public Response authTest(@Context HttpServletRequest request) {
+        if (Authorization.shared.isAuthenticated(request) != Response.Status.OK) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+        //to some stuff and return data
+        return Response.status(Response.Status.OK).build();
+    }
+
 }
