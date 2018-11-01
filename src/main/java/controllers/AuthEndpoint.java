@@ -1,6 +1,5 @@
 package controllers;
 
-import helpers.Common;
 import model.TokenRequest;
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
@@ -12,7 +11,6 @@ import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.json.Json;
-import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -21,12 +19,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 
-@Path("/test")
+@Path("/authorization")
 public class AuthEndpoint {
 
-    private String url = "http://localhost:8080/EventBackend/";
+    private String url = "http://80.211.62.201:8080/AuthorizationServer/";
 
-    @Path("/test2")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response tokenRequest(String tokenRequestString) throws IOException {
@@ -44,7 +41,7 @@ public class AuthEndpoint {
     private Response returnAccessTokenResponse(TokenRequest tokenRequest) {
         try {
             OAuthClientRequest request = OAuthClientRequest.tokenLocation(
-                    this.url + "api/accessToken")
+                    this.url + "accessToken")
                     .setGrantType(GrantType.PASSWORD)
                     .setClientId(tokenRequest.getClientId())
                     .setClientSecret(tokenRequest.getClientSecret())
@@ -72,7 +69,7 @@ public class AuthEndpoint {
     private Response returnRefreshTokenResponse(TokenRequest tokenRequest) {
         try {
             OAuthClientRequest request = OAuthClientRequest.tokenLocation(
-                    this.url + "api/refreshToken")
+                    this.url + "refreshToken")
                     .setGrantType(GrantType.REFRESH_TOKEN)
                     .setClientId(tokenRequest.getClientId())
                     .setClientSecret(tokenRequest.getClientSecret())
