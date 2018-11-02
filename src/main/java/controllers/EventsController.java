@@ -47,11 +47,10 @@ public class EventsController {
     @GET
     @Produces("application/json")
     public JsonArray databaseTest() {
-        DatabaseConnection dbConnection = new DatabaseConnection("admin1", "ch0w4jmyN4523d4n3", "test", "80.211.62.201", "admin");
-        MongoDatabase db = dbConnection.getDatabase();
-        MongoCollection<Document> collection = db.getCollection("test");
-        Document doc = new Document("name", "MongoDB")
-                .append("type", "database")
+        MongoDatabase db = DatabaseConnection.shared.getDatabase();
+        MongoCollection<Document> collection = db.getCollection("test"); //nazwa tabeli
+        Document doc = new Document("name", "MongoDB") // nazwa tabeli
+                .append("type", "database") //kolejne kolumny
                 .append("count", 1)
                 .append("versions", Arrays.asList("v3.2", "v3.0", "v2.6"))
                 .append("info", new Document("x", 203).append("y", 102));

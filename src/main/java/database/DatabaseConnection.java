@@ -1,19 +1,31 @@
 package database;
 
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import helpers.Config;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
+
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.*;
+import static java.util.Arrays.asList;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 public class DatabaseConnection {
 
-    private MongoClient mongoClient;
+    public static DatabaseConnection shared = new DatabaseConnection();
+
     private MongoDatabase database;
 
-    public DatabaseConnection(String userName, String password, String database, String hostName, String authSource) {
-        this.mongoClient = MongoClients.create("mongodb://" + userName + ":" + password + "@" + hostName + ":" + 27017 + "/" + database + "?authSource=" + authSource);
-        //mongodb://localhost:27017/test?authSource=admin --username admin1
-        //this.mongoClient = MongoClients.create();
-        this.database = mongoClient.getDatabase(database);
+    public DatabaseConnection() {
+        MongoClient mongoClient = MongoClients.create("mongodb://" + Config.databaseUserName + ":" + Config.databaseAdminPassword + "@" + Config.databaseUrl + ":" + 27017 + "/" + Config.databaseName + "?authSource=" + Config.databaseAdminName);
+        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
+                fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+
+        this.database = mongoClient.getDatabase(Config.databaseName).withCodecRegistry(pojoCodecRegistry);
     }
 
     public MongoDatabase getDatabase() {
