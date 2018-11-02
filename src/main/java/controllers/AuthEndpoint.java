@@ -1,5 +1,9 @@
 package controllers;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import database.DatabaseConnection;
+import database.entity.User;
 import helpers.Config;
 import model.TokenRequest;
 import org.apache.oltu.oauth2.client.OAuthClient;
@@ -20,6 +24,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.or;
+
 @Path("/authorization")
 public class AuthEndpoint {
 
@@ -39,6 +47,15 @@ public class AuthEndpoint {
 
     private Response returnAccessTokenResponse(TokenRequest tokenRequest) {
         try {
+
+            MongoDatabase database = DatabaseConnection.shared.getDatabase();
+            MongoCollection<User> users = database.getCollection("Users", User.class);
+
+            User existringUser = users.find(and(eq("email", tokenRequest.getEmail()), eq("password", tokenRequest.getPassword()))).first();
+            if (existringUser == null) {
+                return Response.status(Response.Status.NOT_FOUND).entity("User does not exists").build();
+            }
+
             OAuthClientRequest request = OAuthClientRequest.tokenLocation(
                     Config.authorizationUrl + "accessToken")
                     .setGrantType(GrantType.PASSWORD)
