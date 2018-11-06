@@ -36,31 +36,6 @@ public class EventsController {
         return builder.build();
     }
 
-    @Path("/dbTest")
-    @GET
-    @Produces("application/json")
-    public JsonArray databaseTest() {
-        MongoDatabase db = DatabaseConnection.shared.getDatabase();
-        MongoCollection<Document> collection = db.getCollection("test"); //nazwa tabeli
-        Document doc = new Document("name", "MongoDB") // nazwa tabeli
-                .append("type", "database") //kolejne kolumny
-                .append("count", 1)
-                .append("versions", Arrays.asList("v3.2", "v3.0", "v2.6"))
-                .append("info", new Document("x", 203).append("y", 102));
-        collection.insertOne(doc);
-        JsonArrayBuilder builder = Json.createArrayBuilder();
-        builder.add(Json.createObjectBuilder().add("first", collection.find().first().toJson()));
-        return builder.build();
-    }
-
-    @Path("/authTest")
-    @GET
-    public Response authTest(@Context HttpServletRequest request) {
-        if (Authorization.shared.isAuthenticated(request) != Response.Status.OK) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
-        //to some stuff and return data
-        return Response.status(Response.Status.OK).build();
-    }
+    
 
 }
