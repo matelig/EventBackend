@@ -3,14 +3,14 @@ package database.entity;
 public class Category {
     private int id;
     private String name;
-    private String url;
+    private String photoUrl;
 
     public Category() { }
 
-    public Category(int id, String name, String url) {
+    public Category(int id, String name, String photoUrl) {
         this.id = id;
         this.name = name;
-        this.url = url;
+        this.photoUrl = photoUrl;
     }
 
     public int getId() {
@@ -29,11 +29,11 @@ public class Category {
         this.name = name;
     }
 
-    public String getUrl() {
-        return url;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 }

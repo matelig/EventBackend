@@ -8,7 +8,7 @@ public class Event {
     private User owner;
     private List<User> participants;
     private String description;
-    private String photo;
+    private String photoUrl;
     private Long latitude;
     private Long longitude;
     private Date startDate;
@@ -53,12 +53,12 @@ public class Event {
         this.description = description;
     }
 
-    public String getPhoto() {
-        return photo;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setPhoto(String photo) {
-        this.photo = photo;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 
     public Long getLatitude() {
