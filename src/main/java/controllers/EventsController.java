@@ -11,6 +11,7 @@ import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -36,6 +37,15 @@ public class EventsController {
         return builder.build();
     }
 
-    
+    @Path("/add")
+    @POST
+    @Produces("application/json")
+    public Response addNewEvent(@Context HttpServletRequest request) {
+        if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+        return Response.status(Response.Status.CREATED).build();
+    }
+
 
 }
