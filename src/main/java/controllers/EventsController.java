@@ -4,7 +4,11 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import database.DatabaseConnection;
 import helpers.Parser;
+import model.AddEventRequest;
+import model.TokenRequest;
 import org.bson.Document;
+import org.codehaus.jackson.map.ObjectMapper;
+
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
@@ -16,6 +20,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -40,9 +45,16 @@ public class EventsController {
     @Path("/add")
     @POST
     @Produces("application/json")
-    public Response addNewEvent(@Context HttpServletRequest request) {
-        if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+    public Response addNewEvent(@Context HttpServletRequest request, String jsonString) {
+//        if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
+//            return Response.status(Response.Status.UNAUTHORIZED).build();
+//        }
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            AddEventRequest tokenRequest = mapper.readValue(jsonString, AddEventRequest.class);
+            System.out.println("mfjjfjf");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return Response.status(Response.Status.CREATED).build();
     }
