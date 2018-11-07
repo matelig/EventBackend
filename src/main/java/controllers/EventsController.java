@@ -3,16 +3,18 @@ package controllers;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import database.DatabaseConnection;
+import database.entity.Event;
+import database.entity.User;
+import helpers.Authorization;
+import helpers.KeyDecoder;
 import helpers.Parser;
 import model.AddEventRequest;
-import model.TokenRequest;
 import org.bson.Document;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
-import javax.json.JsonObjectBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -21,8 +23,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Map;
+
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.or;
 
 @Path("/events")
 public class EventsController {
@@ -46,17 +49,34 @@ public class EventsController {
     @POST
     @Produces("application/json")
     public Response addNewEvent(@Context HttpServletRequest request, String jsonString) {
-//        if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
-//            return Response.status(Response.Status.UNAUTHORIZED).build();
-//        }
+        if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        String userEmail = KeyDecoder.shared.decode(request);
+        MongoDatabase database = DatabaseConnection.shared.getDatabase();
+        MongoCollection<User> users = database.getCollection("Users", User.class);
+        User existingUser = users.find(eq("email", userEmail)).first();
+
+        if (existingUser == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
         ObjectMapper mapper = new ObjectMapper();
         try {
             AddEventRequest tokenRequest = mapper.readValue(jsonString, AddEventRequest.class);
-            System.out.println("mfjjfjf");
+            Event event = createEventObject(tokenRequest);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
         return Response.status(Response.Status.CREATED).build();
+    }
+
+    private Event createEventObject(AddEventRequest addEventRequest) {
+        Event newEvent = new Event();
+
+        return newEvent;
     }
 
 

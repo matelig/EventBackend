@@ -1,6 +1,5 @@
-package controllers;
+package helpers;
 
-import helpers.Config;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 
 import javax.servlet.http.HttpServletRequest;

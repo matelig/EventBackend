@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Event {
     private String title;
-    private User owner;
+    private Long ownerId;
     private List<User> participants;
     private String description;
     private String photoUrl;
@@ -29,12 +29,12 @@ public class Event {
         this.title = title;
     }
 
-    public User getOwner() {
-        return owner;
+    public Long getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public List<User> getParticipants() {
