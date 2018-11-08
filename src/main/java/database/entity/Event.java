@@ -5,12 +5,12 @@ import java.util.List;
 
 public class Event {
     private String title;
-    private Long ownerId;
+    private int ownerId;
     private List<User> participants;
     private String description;
     private String photoUrl;
-    private Long latitude;
-    private Long longitude;
+    private Double latitude;
+    private Double longitude;
     private Date startDate;
     private Date endDate;
     private boolean showGuestList;
@@ -18,7 +18,7 @@ public class Event {
     private boolean onlyRegistered;
     private Category category;
     private List<Tag> tags;
-    private Long cost;
+    private Double cost;
     private String externalUrl;
 
     public String getTitle() {
@@ -29,11 +29,11 @@ public class Event {
         this.title = title;
     }
 
-    public Long getOwnerId() {
+    public int getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(Long ownerId) {
+    public void setOwnerId(int ownerId) {
         this.ownerId = ownerId;
     }
 
@@ -61,19 +61,19 @@ public class Event {
         this.photoUrl = photoUrl;
     }
 
-    public Long getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(Long latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public Long getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(Long longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
@@ -133,11 +133,11 @@ public class Event {
         this.tags = tags;
     }
 
-    public Long getCost() {
+    public Double getCost() {
         return cost;
     }
 
-    public void setCost(Long cost) {
+    public void setCost(Double cost) {
         this.cost = cost;
     }
 

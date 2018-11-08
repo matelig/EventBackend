@@ -66,16 +66,27 @@ public class EventsController {
         try {
             AddEventRequest tokenRequest = mapper.readValue(jsonString, AddEventRequest.class);
             Event event = createEventObject(tokenRequest);
-
+            event.setOwnerId(existingUser.getId());
+            MongoCollection<Event> events = database.getCollection("Events", Event.class);
+            events.insertOne(event);
+            return Response.status(Response.Status.CREATED).build();
         } catch (IOException e) {
-            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } catch (NumberFormatException e) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        return Response.status(Response.Status.CREATED).build();
     }
 
-    private Event createEventObject(AddEventRequest addEventRequest) {
+    private Event createEventObject(AddEventRequest addEventRequest) throws NumberFormatException {
         Event newEvent = new Event();
-
+        newEvent.setLatitude(Double.parseDouble(addEventRequest.getLatitude()));
+        newEvent.setLongitude(Double.parseDouble(addEventRequest.getLongitude()));
+        newEvent.setCost(Double.parseDouble(addEventRequest.getCost()));
+        newEvent.setDescription(addEventRequest.getDescription());
+        newEvent.setExternalUrl(addEventRequest.getExternalUrl());
+        newEvent.setMaxParticipants(Integer.parseInt(addEventRequest.getMaxParticipants()));
+        newEvent.setOnlyRegistered(Boolean.getBoolean(addEventRequest.isOnlyRegistered()));
+        newEvent.setTitle(addEventRequest.getName());
         return newEvent;
     }
 
