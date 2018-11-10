@@ -5,8 +5,8 @@ import java.util.List;
 
 public class Event {
     private String title;
-    private User owner;
-    private List<User> participants;
+    private Long owner;
+ //   private List<User> participants;
     private String description;
     private String photoUrl;
     private Long latitude;
@@ -16,8 +16,8 @@ public class Event {
     private boolean showGuestList;
     private int maxParticipants;
     private boolean onlyRegistered;
-    private Category category;
-    private List<Tag> tags;
+//    private Category category;
+//    private List<Tag> tags;
     private Long cost;
     private String externalUrl;
 
@@ -29,21 +29,21 @@ public class Event {
         this.title = title;
     }
 
-    public User getOwner() {
+    public Long getOwner() {
         return owner;
     }
 
-    public void setOwner(User owner) {
+    public void setOwner(Long owner) {
         this.owner = owner;
     }
-
-    public List<User> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(List<User> participants) {
-        this.participants = participants;
-    }
+//
+//    public List<User> getParticipants() {
+//        return participants;
+//    }
+//
+//    public void setParticipants(List<User> participants) {
+//        this.participants = participants;
+//    }
 
     public String getDescription() {
         return description;
@@ -117,21 +117,21 @@ public class Event {
         this.onlyRegistered = onlyRegistered;
     }
 
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
+//    public Category getCategory() {
+//        return category;
+//    }
+//
+//    public void setCategory(Category category) {
+//        this.category = category;
+//    }
+//
+//    public List<Tag> getTags() {
+//        return tags;
+//    }
+//
+//    public void setTags(List<Tag> tags) {
+//        this.tags = tags;
+//    }
 
     public Long getCost() {
         return cost;

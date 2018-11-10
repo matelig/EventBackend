@@ -5,19 +5,20 @@ import com.mongodb.client.MongoDatabase;
 import database.DatabaseConnection;
 import database.entity.Category;
 import database.entity.Event;
-import database.entity.User;
 
 import javax.ws.rs.ApplicationPath;
 import java.util.ArrayList;
+import java.util.Date;
 
 @ApplicationPath("/api")
 public class Application extends javax.ws.rs.core.Application {
 
     private String[] categories = {"Sport", "Szkolenia", "Koncerty", "Film", "Konferencje", "Teatr", "Literatura", "Kulinaria",
-                                    "Taniec", "Turystyka", "Motoryzacja", "Biegi", "Gry zespołowe", "Inne"};
+            "Taniec", "Turystyka", "Motoryzacja", "Biegi", "Gry zespołowe", "Inne"};
 
     public Application() {
         initCategories();
+        initEvents();
     }
 
     private void initCategories() {
@@ -29,6 +30,17 @@ public class Application extends javax.ws.rs.core.Application {
                 categoryMongoCollection.insertOne(category);
             }
         }
+    }
+
+    private void initEvents() {
+        MongoDatabase database = DatabaseConnection.shared.getDatabase();
+        MongoCollection<Event> eventMongoCollection = database.getCollection("Events", Event.class);
+        Event event = new Event();
+        event.setCost(52l);
+        event.setStartDate(new Date());
+        event.setDescription("My fourth event");
+        event.setOwner(1l);
+        eventMongoCollection.insertOne(event);
     }
 }
 
