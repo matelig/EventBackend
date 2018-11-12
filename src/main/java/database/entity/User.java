@@ -2,7 +2,7 @@ package database.entity;
 
 public class User {
 
-    private int id;
+    private String id;
     private String email;
     private String nickname;
     private String password;
@@ -15,11 +15,11 @@ public class User {
         this.password = password;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

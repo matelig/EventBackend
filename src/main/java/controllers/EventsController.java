@@ -22,6 +22,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.Date;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
@@ -90,6 +91,12 @@ public class EventsController {
         newEvent.setMaxParticipants(Integer.parseInt(addEventRequest.getMaxParticipants()));
         newEvent.setOnlyRegistered(Boolean.getBoolean(addEventRequest.isOnlyRegistered()));
         newEvent.setTitle(addEventRequest.getName());
+
+        Long startDate = Long.parseLong(addEventRequest.getStartDate());
+        newEvent.setStartDate(new Date(startDate));
+
+        Long endDate = Long.parseLong(addEventRequest.getEndDate());
+        newEvent.setEndDate(new Date(endDate));
         return newEvent;
     }
     @GET
