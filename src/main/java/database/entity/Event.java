@@ -5,8 +5,8 @@ import java.util.List;
 
 public class Event {
     private String title;
-    private int ownerId;
-    private List<User> participants;
+    private String ownerId;
+    private List<String> participantsIds;
     private String description;
     private String photoUrl;
     private Double latitude;
@@ -17,7 +17,7 @@ public class Event {
     private int maxParticipants;
     private boolean onlyRegistered;
     private Category category;
-    private List<Tag> tags;
+    private List<String> tagIds;
     private Double cost;
     private String externalUrl;
 
@@ -29,20 +29,20 @@ public class Event {
         this.title = title;
     }
 
-    public int getOwnerId() {
+    public String getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(int ownerId) {
+    public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
 
-    public List<User> getParticipants() {
-        return participants;
+    public List<String> getParticipants() {
+        return participantsIds;
     }
 
-    public void setParticipants(List<User> participants) {
-        this.participants = participants;
+    public void setParticipants(List<String> participants) {
+        this.participantsIds = participants;
     }
 
     public String getDescription() {
@@ -125,12 +125,12 @@ public class Event {
         this.category = category;
     }
 
-    public List<Tag> getTags() {
-        return tags;
+    public List<String> getTags() {
+        return tagIds;
     }
 
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
+    public void setTags(List<String> tags) {
+        this.tagIds = tags;
     }
 
     public Double getCost() {

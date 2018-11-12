@@ -7,6 +7,7 @@ import database.DatabaseConnection;
 import database.entity.User;
 import model.SignUpUserRequest;
 import model.TokenRequest;
+import org.apache.oltu.oauth2.as.issuer.UUIDValueGenerator;
 import org.bson.BsonDocument;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
@@ -22,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,6 +55,7 @@ public class RegisterController {
                 return Response.status(409).build();
             }
             User newUser = new User(tokenRequest.getEmail(), tokenRequest.getNickname(), tokenRequest.getPassword());
+            newUser.setId(UUID.randomUUID().toString());
             users.insertOne(newUser);
         } catch (IOException e) {
             e.printStackTrace();
