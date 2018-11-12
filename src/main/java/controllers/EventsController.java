@@ -1,9 +1,10 @@
 package controllers;
 
+import com.google.gson.Gson;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import database.DatabaseConnection;
-import database.entity.Event;
 import database.entity.Event;
 import database.entity.User;
 import helpers.Authorization;
@@ -11,8 +12,8 @@ import helpers.KeyDecoder;
 import helpers.Parser;
 import model.AddEventRequest;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.json.JSONObject;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -22,14 +23,11 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import static com.mongodb.client.model.Filters.and;
-import static com.mongodb.client.model.Filters.eq;
-
-
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.or;
+import static com.mongodb.client.model.Filters.*;
 
 @Path("/events")
 public class EventsController {
@@ -90,6 +88,7 @@ public class EventsController {
         newEvent.setExternalUrl(addEventRequest.getExternalUrl());
         newEvent.setMaxParticipants(Integer.parseInt(addEventRequest.getMaxParticipants()));
         newEvent.setOnlyRegistered(Boolean.getBoolean(addEventRequest.isOnlyRegistered()));
+        newEvent.setCategoryId(addEventRequest.getCategoryId());
         newEvent.setTitle(addEventRequest.getName());
 
         Long startDate = Long.parseLong(addEventRequest.getStartDate());
@@ -99,16 +98,19 @@ public class EventsController {
         newEvent.setEndDate(new Date(endDate));
         return newEvent;
     }
+
     @GET
     @Produces("application/json")
-    public JsonArray getAllEvents() {
+    public Response getAllEvents() {
         MongoDatabase database = DatabaseConnection.shared.getDatabase();
-        MongoCollection<Document> collection = database.getCollection("Events");
-        JsonArrayBuilder builder = Json.createArrayBuilder();
-        for (Document doc : collection.find()) {
-            builder.add(Parser.shared.parse(doc));
+        MongoCollection<Event> collection = database.getCollection("Events", Event.class);
+        Date inputDate = new Date();
+        FindIterable<Event> results = collection.find(gte("startDate", inputDate));
+        List<Event> events = new ArrayList<Event>();
+        for (Event event : results) {
+            events.add(event);
         }
-        return builder.build();
+        return Response.ok(new Gson().toJson(events)).build();
     }
 
     @GET
@@ -117,7 +119,35 @@ public class EventsController {
     public Response getEventById(@PathParam("eventId") String eventId) {
         MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Event> events = database.getCollection("Events", Event.class);
-        Event event = events.find(eq("_id", eventId)).first();
-        return Response.ok(new JSONObject(event)).build();
+        Event event = events.find(eq("_id", new ObjectId(eventId))).first();
+        return Response.ok(new Gson().toJson(event)).build();
+    }
+
+    @GET
+    @Path("/users/{ownerId}")
+    @Produces("application/json")
+    public Response getEventsByOwnerId(@PathParam("ownerId") String ownerId) {
+        MongoDatabase database = DatabaseConnection.shared.getDatabase();
+        MongoCollection<Event> eventsCollection = database.getCollection("Events", Event.class);
+        List<Event> events = new ArrayList<Event>();
+        Date inputDate = new Date();
+        FindIterable<Event> results = eventsCollection.find(and(eq("ownerId", ownerId), gte("startDate", inputDate)));
+        for (Event event : results)
+            events.add(event);
+        return Response.ok(new Gson().toJson(events)).build();
+    }
+
+    @GET
+    @Path("/categories/{categoryId}")
+    @Produces("application/json")
+    public Response getEventsByCategoryId(@PathParam("categoryId") String categoryId) {
+        MongoDatabase database = DatabaseConnection.shared.getDatabase();
+        MongoCollection<Event> eventsCollection = database.getCollection("Events", Event.class);
+        List<Event> events = new ArrayList<Event>();
+        Date inputDate = new Date();
+        FindIterable<Event> results = eventsCollection.find(and(eq("categoryId", categoryId), gte("startDate", inputDate)));
+        for (Event event : results)
+            events.add(event);
+        return Response.ok(new Gson().toJson(events)).build();
     }
 }

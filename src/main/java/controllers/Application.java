@@ -7,6 +7,8 @@ import database.entity.Category;
 import database.entity.Event;
 
 import javax.ws.rs.ApplicationPath;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -18,7 +20,7 @@ public class Application extends javax.ws.rs.core.Application {
 
     public Application() {
         initCategories();
-        initEvents();
+        //initEvents();
     }
 
     private void initCategories() {
@@ -32,14 +34,22 @@ public class Application extends javax.ws.rs.core.Application {
         }
     }
 
+    //todo delete helper method
     private void initEvents() {
         MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Event> eventMongoCollection = database.getCollection("Events", Event.class);
         Event event = new Event();
-        event.setCost(52l);
-        event.setStartDate(new Date());
-        event.setDescription("My fourth event");
-        event.setOwner(1l);
+        event.setCost(52.0);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date date;
+        try {
+            date = sdf.parse("21/12/2018");
+            event.setStartDate(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        event.setCategoryId("2");
+        event.setDescription("My very new event");
         eventMongoCollection.insertOne(event);
     }
 }

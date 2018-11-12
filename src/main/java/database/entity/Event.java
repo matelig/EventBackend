@@ -16,7 +16,7 @@ public class Event {
     private boolean showGuestList;
     private int maxParticipants;
     private boolean onlyRegistered;
-    private Category category;
+    private String categoryId;
     private List<String> tagIds;
     private Double cost;
     private String externalUrl;
@@ -117,12 +117,12 @@ public class Event {
         this.onlyRegistered = onlyRegistered;
     }
 
-    public Category getCategory() {
-        return category;
+    public String getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
     }
 
     public List<String> getTags() {
