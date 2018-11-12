@@ -10,25 +10,25 @@ public class AddEventRequest {
     @JsonProperty(value = "description")
     private String description;
     @JsonProperty(value = "latitude")
-    private Long latitude;
+    private String latitude;
     @JsonProperty(value = "longitude")
-    private Long longitude;
+    private String longitude;
     @JsonProperty(value = "startDate")
-    private Date startDate;
+    private String startDate;
     @JsonProperty(value = "endDate")
-    private Date endDate;
+    private String endDate;
     @JsonProperty(value = "showGuestList")
-    private boolean showGuestList;
+    private String showGuestList;
     @JsonProperty(value = "maxParticipants")
-    private int maxParticipants;
+    private String maxParticipants;
     @JsonProperty(value = "onlyRegistered")
-    private boolean onlyRegistered;
+    private String onlyRegistered;
     @JsonProperty(value = "externalUrl")
     private String externalUrl;
     @JsonProperty(value = "categoryId")
-    private int categoryId;
+    private String categoryId;
     @JsonProperty(value = "cost")
-    private Long cost;
+    private String cost;
 
     public String getName() {
         return name;
@@ -46,59 +46,59 @@ public class AddEventRequest {
         this.description = description;
     }
 
-    public Long getLatitude() {
+    public String getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(Long latitude) {
+    public void setLatitude(String latitude) {
         this.latitude = latitude;
     }
 
-    public Long getLongitude() {
+    public String getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(Long longitude) {
+    public void setLongitude(String longitude) {
         this.longitude = longitude;
     }
 
-    public Date getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public String getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
 
-    public boolean isShowGuestList() {
+    public String isShowGuestList() {
         return showGuestList;
     }
 
-    public void setShowGuestList(boolean showGuestList) {
+    public void setShowGuestList(String showGuestList) {
         this.showGuestList = showGuestList;
     }
 
-    public int getMaxParticipants() {
+    public String getMaxParticipants() {
         return maxParticipants;
     }
 
-    public void setMaxParticipants(int maxParticipants) {
+    public void setMaxParticipants(String maxParticipants) {
         this.maxParticipants = maxParticipants;
     }
 
-    public boolean isOnlyRegistered() {
+    public String isOnlyRegistered() {
         return onlyRegistered;
     }
 
-    public void setOnlyRegistered(boolean onlyRegistered) {
+    public void setOnlyRegistered(String onlyRegistered) {
         this.onlyRegistered = onlyRegistered;
     }
 
@@ -110,19 +110,19 @@ public class AddEventRequest {
         this.externalUrl = externalUrl;
     }
 
-    public int getCategoryId() {
+    public String getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(int categoryId) {
+    public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
     }
 
-    public Long getCost() {
+    public String getCost() {
         return cost;
     }
 
-    public void setCost(Long cost) {
+    public void setCost(String cost) {
         this.cost = cost;
     }
 }

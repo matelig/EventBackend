@@ -4,6 +4,10 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import database.DatabaseConnection;
 import database.entity.Event;
+import database.entity.Event;
+import database.entity.User;
+import helpers.Authorization;
+import helpers.KeyDecoder;
 import helpers.Parser;
 import model.AddEventRequest;
 import org.bson.Document;
@@ -22,6 +26,9 @@ import java.io.IOException;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 
+
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.or;
 
 @Path("/events")
 public class EventsController {
@@ -45,19 +52,46 @@ public class EventsController {
     @POST
     @Produces("application/json")
     public Response addNewEvent(@Context HttpServletRequest request, String jsonString) {
-//        if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
-//            return Response.status(Response.Status.UNAUTHORIZED).build();
-//        }
+        if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        String userEmail = KeyDecoder.shared.decode(request);
+        MongoDatabase database = DatabaseConnection.shared.getDatabase();
+        MongoCollection<User> users = database.getCollection("Users", User.class);
+        User existingUser = users.find(eq("email", userEmail)).first();
+
+        if (existingUser == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
         ObjectMapper mapper = new ObjectMapper();
         try {
             AddEventRequest tokenRequest = mapper.readValue(jsonString, AddEventRequest.class);
-            System.out.println("mfjjfjf");
+            Event event = createEventObject(tokenRequest);
+            event.setOwnerId(existingUser.getId());
+            MongoCollection<Event> events = database.getCollection("Events", Event.class);
+            events.insertOne(event);
+            return Response.status(Response.Status.CREATED).build();
         } catch (IOException e) {
-            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } catch (NumberFormatException e) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        return Response.status(Response.Status.CREATED).build();
     }
 
+    private Event createEventObject(AddEventRequest addEventRequest) throws NumberFormatException {
+        Event newEvent = new Event();
+        newEvent.setLatitude(Double.parseDouble(addEventRequest.getLatitude()));
+        newEvent.setLongitude(Double.parseDouble(addEventRequest.getLongitude()));
+        newEvent.setCost(Double.parseDouble(addEventRequest.getCost()));
+        newEvent.setDescription(addEventRequest.getDescription());
+        newEvent.setExternalUrl(addEventRequest.getExternalUrl());
+        newEvent.setMaxParticipants(Integer.parseInt(addEventRequest.getMaxParticipants()));
+        newEvent.setOnlyRegistered(Boolean.getBoolean(addEventRequest.isOnlyRegistered()));
+        newEvent.setTitle(addEventRequest.getName());
+        return newEvent;
+    }
     @GET
     @Produces("application/json")
     public JsonArray getAllEvents() {

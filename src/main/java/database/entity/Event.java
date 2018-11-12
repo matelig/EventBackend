@@ -5,20 +5,20 @@ import java.util.List;
 
 public class Event {
     private String title;
-    private Long owner;
- //   private List<User> participants;
+    private int ownerId;
+    private List<User> participants;
     private String description;
     private String photoUrl;
-    private Long latitude;
-    private Long longitude;
+    private Double latitude;
+    private Double longitude;
     private Date startDate;
     private Date endDate;
     private boolean showGuestList;
     private int maxParticipants;
     private boolean onlyRegistered;
-//    private Category category;
-//    private List<Tag> tags;
-    private Long cost;
+    private Category category;
+    private List<Tag> tags;
+    private Double cost;
     private String externalUrl;
 
     public String getTitle() {
@@ -29,21 +29,21 @@ public class Event {
         this.title = title;
     }
 
-    public Long getOwner() {
-        return owner;
+    public int getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwner(Long owner) {
-        this.owner = owner;
+    public void setOwnerId(int ownerId) {
+        this.ownerId = ownerId;
     }
-//
-//    public List<User> getParticipants() {
-//        return participants;
-//    }
-//
-//    public void setParticipants(List<User> participants) {
-//        this.participants = participants;
-//    }
+
+    public List<User> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<User> participants) {
+        this.participants = participants;
+    }
 
     public String getDescription() {
         return description;
@@ -61,19 +61,19 @@ public class Event {
         this.photoUrl = photoUrl;
     }
 
-    public Long getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(Long latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public Long getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(Long longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
@@ -117,27 +117,27 @@ public class Event {
         this.onlyRegistered = onlyRegistered;
     }
 
-//    public Category getCategory() {
-//        return category;
-//    }
-//
-//    public void setCategory(Category category) {
-//        this.category = category;
-//    }
-//
-//    public List<Tag> getTags() {
-//        return tags;
-//    }
-//
-//    public void setTags(List<Tag> tags) {
-//        this.tags = tags;
-//    }
+    public Category getCategory() {
+        return category;
+    }
 
-    public Long getCost() {
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
+
+    public Double getCost() {
         return cost;
     }
 
-    public void setCost(Long cost) {
+    public void setCost(Double cost) {
         this.cost = cost;
     }
 
