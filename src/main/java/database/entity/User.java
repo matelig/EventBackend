@@ -2,6 +2,7 @@ package database.entity;
 
 public class User {
 
+    private String id;
     private String email;
     private String nickname;
     private String password;
@@ -12,6 +13,14 @@ public class User {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getEmail() {
