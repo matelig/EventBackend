@@ -20,7 +20,7 @@ public class Application extends javax.ws.rs.core.Application {
 
     public Application() {
         initCategories();
-        //initEvents();
+        // initEvents();
     }
 
     private void initCategories() {
@@ -38,18 +38,16 @@ public class Application extends javax.ws.rs.core.Application {
     private void initEvents() {
         MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Event> eventMongoCollection = database.getCollection("Events", Event.class);
-        Event event = new Event();
-        event.setCost(52.0);
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        Date date;
+        Date date = new Date();
         try {
             date = sdf.parse("21/12/2018");
-            event.setStartDate(date);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        event.setCategoryId("2");
-        event.setDescription("My very new event");
+        Event event = new Event("Koncert", "Koncert Bryan Adams", date, true, 40,
+                false, "2", 50.0d, "www.google.pl");
+        event.setOwnerId("4153f486-094d-4443-9742-0480590c52e2");
         eventMongoCollection.insertOne(event);
     }
 }
