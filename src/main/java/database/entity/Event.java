@@ -16,17 +16,62 @@ public class Event {
     private boolean showGuestList;
     private int maxParticipants;
     private boolean onlyRegistered;
-    private Category category;
+    private String categoryId;
     private List<String> tagIds;
     private Double cost;
     private String externalUrl;
+
+    public Event(String title, String description, Date startDate, boolean showGuestList,
+                 int maxParticipants, boolean onlyRegistered, String categoryId, Double cost, String externalUrl) {
+        this.title = title;
+        this.description = description;
+        this.startDate = startDate;
+        this.showGuestList = showGuestList;
+        this.maxParticipants = maxParticipants;
+        this.onlyRegistered = onlyRegistered;
+        this.categoryId = categoryId;
+        this.cost = cost;
+        this.externalUrl = externalUrl;
+    }
+
+    public Event(String title, String description, Double latitude, Double longitude,
+                 int maxParticipants, boolean onlyRegistered, String categoryId, Double cost, String externalUrl) {
+        this.title = title;
+        this.description = description;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.maxParticipants = maxParticipants;
+        this.onlyRegistered = onlyRegistered;
+        this.categoryId = categoryId;
+        this.cost = cost;
+        this.externalUrl = externalUrl;
+    }
+
+    public Event() {
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public List<String> getParticipantsIds() {
+        return participantsIds;
+    }
+
+    public void setParticipantsIds(List<String> participantsIds) {
+        this.participantsIds = participantsIds;
+    }
+
+    public List<String> getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(List<String> tagIds) {
+        this.tagIds = tagIds;
     }
 
     public String getOwnerId() {
@@ -117,12 +162,12 @@ public class Event {
         this.onlyRegistered = onlyRegistered;
     }
 
-    public Category getCategory() {
-        return category;
+    public String getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
     }
 
     public List<String> getTags() {

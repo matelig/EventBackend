@@ -51,8 +51,8 @@ public class AuthEndpoint {
             MongoDatabase database = DatabaseConnection.shared.getDatabase();
             MongoCollection<User> users = database.getCollection("Users", User.class);
 
-            User existringUser = users.find(and(eq("email", tokenRequest.getEmail()), eq("password", tokenRequest.getPassword()))).first();
-            if (existringUser == null) {
+            User existingUser = users.find(and(eq("email", tokenRequest.getEmail()), eq("password", tokenRequest.getPassword()))).first();
+            if (existingUser == null) {
                 return Response.status(Response.Status.NOT_FOUND).entity("User does not exists").build();
             }
 
