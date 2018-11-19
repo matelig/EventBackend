@@ -9,6 +9,7 @@ import database.entity.Category;
 import database.entity.Event;
 import database.entity.User;
 import helpers.Authorization;
+import helpers.GeocodingHelper;
 import helpers.KeyDecoder;
 import helpers.Parser;
 import model.AddEventRequest;
@@ -33,6 +34,7 @@ import static com.mongodb.client.model.Filters.*;
 
 @Path("/events")
 public class EventsController {
+    private static Gson gson = new Gson();
 
     @Path("/categories")
     @GET
@@ -70,11 +72,11 @@ public class EventsController {
             event.setOwnerId(existingUser.getId());
             MongoCollection<Event> events = database.getCollection("Events", Event.class);
             events.insertOne(event);
-            return Response.status(Response.Status.CREATED).build();
+            return Response.status(Response.Status.CREATED).entity(gson.toJson(event)).build();
         } catch (IOException e) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException(e.getMessage()))).build();
         } catch (NumberFormatException e) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Wrong date format"))).build();
         }
     }
 
@@ -89,6 +91,8 @@ public class EventsController {
 
         Long endDate = Long.parseLong(addEventRequest.getEndDate());
         newEvent.setEndDate(new Date(endDate));
+        newEvent.setAddress(GeocodingHelper.reverseGeocode(Double.parseDouble(addEventRequest.getLatitude()),
+                Double.parseDouble(addEventRequest.getLongitude())));
         return newEvent;
     }
 
@@ -103,7 +107,7 @@ public class EventsController {
         for (Event event : results) {
             resultEvents.add(event);
         }
-        return Response.ok(new Gson().toJson(resultEvents)).build();
+        return Response.ok(gson.toJson(resultEvents)).build();
     }
 
     @GET
@@ -114,14 +118,14 @@ public class EventsController {
         try {
             eventObjectId = new ObjectId(eventId);
         } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(new Gson().toJson(new ApiException("Wrong eventId format"))).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Wrong eventId format"))).build();
         }
         MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Event> events = database.getCollection("Events", Event.class);
         Event event = events.find(eq("_id", eventObjectId)).first();
         if (event == null)
-            return Response.status(Response.Status.BAD_REQUEST).entity(new Gson().toJson(new ApiException("Event not found"))).build();
-        return Response.ok(new Gson().toJson(event)).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Event not found"))).build();
+        return Response.ok(gson.toJson(event)).build();
     }
 
     @GET
@@ -132,14 +136,14 @@ public class EventsController {
         MongoCollection<User> users = database.getCollection("Users", User.class);
         User existingUser = users.find(eq("_id", ownerId)).first();
         if (existingUser == null)
-            return Response.status(Response.Status.BAD_REQUEST).entity(new Gson().toJson(new ApiException("User not found"))).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("User not found"))).build();
         MongoCollection<Event> eventsCollection = database.getCollection("Events", Event.class);
         List<Event> events = new ArrayList<Event>();
         Date inputDate = new Date();
         FindIterable<Event> results = eventsCollection.find(and(eq("ownerId", ownerId), gte("startDate", inputDate)));
         for (Event event : results)
             events.add(event);
-        return Response.ok(new Gson().toJson(events)).build();
+        return Response.ok(gson.toJson(events)).build();
     }
 
     @GET
@@ -150,19 +154,19 @@ public class EventsController {
         try {
             categoryIdInt = Integer.parseInt(categoryId);
         } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(new Gson().toJson(new ApiException("Wrong categoryId format"))).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Wrong categoryId format"))).build();
         }
         MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Category> categories = database.getCollection("Categories", Category.class);
         Category category = categories.find(eq("_id", categoryIdInt)).first();
         if (category == null)
-            return Response.status(Response.Status.BAD_REQUEST).entity(new Gson().toJson(new ApiException("Category not found"))).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Category not found"))).build();
         MongoCollection<Event> eventsCollection = database.getCollection("Events", Event.class);
         List<Event> events = new ArrayList<Event>();
         Date inputDate = new Date();
         FindIterable<Event> results = eventsCollection.find(and(eq("categoryId", categoryId), gte("startDate", inputDate)));
         for (Event event : results)
             events.add(event);
-        return Response.ok(new Gson().toJson(events)).build();
+        return Response.ok(gson.toJson(events)).build();
     }
 }
