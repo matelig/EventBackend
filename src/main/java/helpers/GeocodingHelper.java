@@ -16,14 +16,14 @@ public class GeocodingHelper {
         return instance;
     }
 
-    public static Address reverseGeocode(double lat, double lon) {
+    public static Address reverseGeocode(Double lat, Double lon) {
         JOpenCageReverseRequest request = new JOpenCageReverseRequest(lat, lon);
         request.setNoAnnotations(true);
 
         JOpenCageResponse response = getGeocoderInstance().reverse(request);
         JOpenCageComponents components = null;
         Address address = null;
-        if (response == null || response.getStatus().getCode() != 200)
+        if (response == null || response.getStatus().getCode() != 200 || lat == null || lon == null)
             return address;
         if (response.getResults() != null && !response.getResults().isEmpty())
             components = response.getResults().get(0).getComponents();
