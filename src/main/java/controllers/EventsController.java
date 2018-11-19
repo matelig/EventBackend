@@ -77,10 +77,12 @@ public class EventsController {
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException(e.getMessage()))).build();
         } catch (NumberFormatException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Wrong date format"))).build();
+        } catch (NullPointerException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("All required fields must be provided"))).build();
         }
     }
 
-    private Event createEventObject(AddEventRequest addEventRequest) throws NumberFormatException {
+    private Event createEventObject(AddEventRequest addEventRequest) throws NumberFormatException, NullPointerException {
         Event newEvent = new Event(addEventRequest.getName(), addEventRequest.getDescription(), Double.parseDouble(addEventRequest.getLatitude()),
                 Double.parseDouble(addEventRequest.getLongitude()), Integer.parseInt(addEventRequest.getMaxParticipants()),
                 Boolean.getBoolean(addEventRequest.isOnlyRegistered()), addEventRequest.getCategoryId(),
