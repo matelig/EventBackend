@@ -8,11 +8,10 @@ import database.entity.Address;
 
 public class GeocodingHelper {
     private static JOpenCageGeocoder instance;
-    private static String API_KEY = "9ae4702d5beb4db48ebaf98a3d849341";
 
     private static JOpenCageGeocoder getGeocoderInstance() {
         if (instance == null)
-            instance = new JOpenCageGeocoder(API_KEY);
+            instance = new JOpenCageGeocoder(Config.geocodingApiKey);
         return instance;
     }
 
