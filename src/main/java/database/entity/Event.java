@@ -20,6 +20,7 @@ public class Event {
     private List<String> tagIds;
     private Double cost;
     private String externalUrl;
+    private Address address;
 
     public Event(String title, String description, Date startDate, boolean showGuestList,
                  int maxParticipants, boolean onlyRegistered, String categoryId, Double cost, String externalUrl) {
@@ -193,4 +194,13 @@ public class Event {
     public void setExternalUrl(String externalUrl) {
         this.externalUrl = externalUrl;
     }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
 }

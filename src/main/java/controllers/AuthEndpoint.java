@@ -1,10 +1,12 @@
 package controllers;
 
+import com.google.gson.Gson;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import database.DatabaseConnection;
 import database.entity.User;
 import helpers.Config;
+import model.ApiException;
 import model.TokenRequest;
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
@@ -26,10 +28,10 @@ import java.io.IOException;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.or;
 
 @Path("/authorization")
 public class AuthEndpoint {
+    private static final Gson gson = new Gson();
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -41,7 +43,7 @@ public class AuthEndpoint {
         } else if (tokenRequest.getGrantType().equals(GrantType.REFRESH_TOKEN.toString())) {
             return returnRefreshTokenResponse(tokenRequest);
         } else {
-            return Response.status(406).build();
+            return Response.status(Response.Status.NOT_ACCEPTABLE).entity(gson.toJson(new ApiException("Wrong grant type"))).build();
         }
     }
 
@@ -53,7 +55,7 @@ public class AuthEndpoint {
 
             User existingUser = users.find(and(eq("email", tokenRequest.getEmail()), eq("password", tokenRequest.getPassword()))).first();
             if (existingUser == null) {
-                return Response.status(Response.Status.NOT_FOUND).entity("User does not exists").build();
+                return Response.status(Response.Status.NOT_FOUND).entity(gson.toJson(new ApiException("User does not exists"))).build();
             }
 
             OAuthClientRequest request = OAuthClientRequest.tokenLocation(
@@ -90,7 +92,7 @@ public class AuthEndpoint {
                     .setClientId(tokenRequest.getClientId())
                     .setClientSecret(tokenRequest.getClientSecret())
                     .setRefreshToken(tokenRequest.getRefreshToken())
-            .buildBodyMessage();
+                    .buildBodyMessage();
             OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
             OAuthAccessTokenResponse oauthResponse = oAuthClient.accessToken(request);
             System.out.println(oauthResponse.getAccessToken());
