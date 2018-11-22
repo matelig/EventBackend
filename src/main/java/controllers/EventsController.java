@@ -17,10 +17,9 @@ import model.ApiException;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.json.JSONObject;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
+import javax.json.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -29,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import static com.mongodb.client.model.Filters.*;
 
@@ -95,6 +95,8 @@ public class EventsController {
         newEvent.setEndDate(new Date(endDate));
         newEvent.setAddress(GeocodingHelper.reverseGeocode(Double.parseDouble(addEventRequest.getLatitude()),
                 Double.parseDouble(addEventRequest.getLongitude())));
+        newEvent.setPhotoUrl(addEventRequest.getPhotoUrl());
+        newEvent.setId(UUID.randomUUID().toString());
         return newEvent;
     }
 
@@ -160,15 +162,29 @@ public class EventsController {
         }
         MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Category> categories = database.getCollection("Categories", Category.class);
+        MongoCollection<User> users = database.getCollection("Users", User.class);
         Category category = categories.find(eq("_id", categoryIdInt)).first();
         if (category == null)
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Category not found"))).build();
         MongoCollection<Event> eventsCollection = database.getCollection("Events", Event.class);
-        List<Event> events = new ArrayList<Event>();
+        JsonArrayBuilder jsonArray = Json.createArrayBuilder();
         Date inputDate = new Date();
         FindIterable<Event> results = eventsCollection.find(and(eq("categoryId", categoryId), gte("startDate", inputDate)));
-        for (Event event : results)
-            events.add(event);
-        return Response.ok(gson.toJson(events)).build();
+        for (Event event : results) {
+            User owner = users.find(eq("_id", event.getOwnerId())).first();
+            jsonArray.add(createEventForCategoryJsonResponse(event, owner.getNickname()));
+        }
+        return Response.ok(jsonArray.build()).build();
+    }
+
+    private JsonObject createEventForCategoryJsonResponse(Event event, String userName) {
+        JsonObjectBuilder json = Json.createObjectBuilder();
+        json.add("id", event.getId());
+        json.add("title", event.getTitle());
+        json.add("description", event.getDescription());
+        json.add("ownerId", event.getOwnerId());
+        json.add("photoUrl", event.getPhotoUrl());
+        json.add("ownerName", userName);
+        return json.build();
     }
 }

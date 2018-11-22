@@ -29,6 +29,8 @@ public class AddEventRequest {
     private String categoryId;
     @JsonProperty(value = "cost")
     private String cost;
+    @JsonProperty(value = "photoUrl")
+    private String photoUrl;
 
     public String getName() {
         return name;
@@ -124,5 +126,21 @@ public class AddEventRequest {
 
     public void setCost(String cost) {
         this.cost = cost;
+    }
+
+    public String getShowGuestList() {
+        return showGuestList;
+    }
+
+    public String getOnlyRegistered() {
+        return onlyRegistered;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 }
