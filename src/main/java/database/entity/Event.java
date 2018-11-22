@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 public class Event {
+    private String id;
     private String title;
     private String ownerId;
     private List<String> participantsIds;
@@ -203,4 +204,11 @@ public class Event {
         this.address = address;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }
