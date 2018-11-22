@@ -163,8 +163,6 @@ public class EventsController {
         MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Category> categories = database.getCollection("Categories", Category.class);
         MongoCollection<User> users = database.getCollection("Users", User.class);
-
-//        User existingUser = users.find(and(eq("email", tokenRequest.getEmail()), eq("password", tokenRequest.getPassword()))).first();
         Category category = categories.find(eq("_id", categoryIdInt)).first();
         if (category == null)
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Category not found"))).build();
