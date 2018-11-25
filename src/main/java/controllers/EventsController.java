@@ -14,10 +14,10 @@ import helpers.KeyDecoder;
 import helpers.Parser;
 import model.AddEventRequest;
 import model.ApiException;
+import model.EventsFilter;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.json.JSONObject;
 
 import javax.json.*;
 import javax.servlet.http.HttpServletRequest;
@@ -26,9 +26,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.*;
 
@@ -89,10 +90,10 @@ public class EventsController {
                 Double.parseDouble(addEventRequest.getCost()), addEventRequest.getExternalUrl());
 
         Long startDate = Long.parseLong(addEventRequest.getStartDate());
-        newEvent.setStartDate(new Date(startDate));
+        newEvent.setStartDate(startDate);
 
         Long endDate = Long.parseLong(addEventRequest.getEndDate());
-        newEvent.setEndDate(new Date(endDate));
+        newEvent.setEndDate(endDate);
         newEvent.setAddress(GeocodingHelper.reverseGeocode(Double.parseDouble(addEventRequest.getLatitude()),
                 Double.parseDouble(addEventRequest.getLongitude())));
         newEvent.setPhotoUrl(addEventRequest.getPhotoUrl());
@@ -102,16 +103,44 @@ public class EventsController {
 
     @GET
     @Produces("application/json")
-    public Response getAllEvents() {
+    public Response getAllEvents(@Context HttpServletRequest request) {
+        if (!request.getParameterMap().isEmpty())
+            return getFilteredEvents(request);
         MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Event> events = database.getCollection("Events", Event.class);
-        Date inputDate = new Date();
-        FindIterable<Event> results = events.find(gte("startDate", inputDate));
+        Long currentDateSecond = System.currentTimeMillis() / 1000;
+        FindIterable<Event> results = events.find(gte("startDate", currentDateSecond));
         List<Event> resultEvents = new ArrayList<Event>();
         for (Event event : results) {
             resultEvents.add(event);
         }
         return Response.ok(gson.toJson(resultEvents)).build();
+    }
+
+
+    private Response getFilteredEvents(@Context HttpServletRequest request) {
+        EventsFilter filter = new EventsFilter(request);
+        MongoDatabase database = DatabaseConnection.shared.getDatabase();
+        MongoCollection<Event> events = database.getCollection("Events", Event.class);
+        Long currentDateSecond = System.currentTimeMillis() / 1000;
+        FindIterable<Event> results = events.find(gte("startDate", currentDateSecond));
+        List<Event> resultEvents = new ArrayList<Event>();
+        for (Event event : results) {
+            resultEvents.add(event);
+        }
+        List<Event> filteredEvents = filterEvents(resultEvents, filter);
+        return Response.ok(gson.toJson(filteredEvents)).build();
+    }
+
+    private List<Event> filterEvents(List<Event> events, EventsFilter filter) {
+        return events.stream()
+                .filter(filter.getCategoryPredicate())
+                .filter(filter.getCityPredicate())
+                .filter(filter.getFreeEntryPredicate())
+                .filter(filter.getMaxPricePredicate())
+                .filter(filter.getStartDatePredicate())
+                .filter(filter.getEndDatePredicate())
+                .collect(Collectors.toList());
     }
 
     @GET
@@ -143,7 +172,7 @@ public class EventsController {
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("User not found"))).build();
         MongoCollection<Event> eventsCollection = database.getCollection("Events", Event.class);
         List<Event> events = new ArrayList<Event>();
-        Date inputDate = new Date();
+        Long inputDate = System.currentTimeMillis();
         FindIterable<Event> results = eventsCollection.find(and(eq("ownerId", ownerId), gte("startDate", inputDate)));
         for (Event event : results)
             events.add(event);
@@ -168,7 +197,7 @@ public class EventsController {
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Category not found"))).build();
         MongoCollection<Event> eventsCollection = database.getCollection("Events", Event.class);
         JsonArrayBuilder jsonArray = Json.createArrayBuilder();
-        Date inputDate = new Date();
+        Long inputDate = System.currentTimeMillis();
         FindIterable<Event> results = eventsCollection.find(and(eq("categoryId", categoryId), gte("startDate", inputDate)));
         for (Event event : results) {
             User owner = users.find(eq("_id", event.getOwnerId())).first();

@@ -12,8 +12,8 @@ public class Event {
     private String photoUrl;
     private Double latitude;
     private Double longitude;
-    private Date startDate;
-    private Date endDate;
+    private Long startDate;
+    private Long endDate;
     private boolean showGuestList;
     private int maxParticipants;
     private boolean onlyRegistered;
@@ -23,7 +23,7 @@ public class Event {
     private String externalUrl;
     private Address address;
 
-    public Event(String title, String description, Date startDate, boolean showGuestList,
+    public Event(String title, String description, Long startDate, boolean showGuestList,
                  int maxParticipants, boolean onlyRegistered, String categoryId, Double cost, String externalUrl) {
         this.title = title;
         this.description = description;
@@ -124,19 +124,19 @@ public class Event {
         this.longitude = longitude;
     }
 
-    public Date getStartDate() {
+    public Long getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(Long startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public Long getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(Long endDate) {
         this.endDate = endDate;
     }
 
@@ -170,14 +170,6 @@ public class Event {
 
     public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
-    }
-
-    public List<String> getTags() {
-        return tagIds;
-    }
-
-    public void setTags(List<String> tags) {
-        this.tagIds = tags;
     }
 
     public Double getCost() {
