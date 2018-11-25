@@ -26,10 +26,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.*;
 
@@ -117,7 +115,6 @@ public class EventsController {
         return Response.ok(gson.toJson(resultEvents)).build();
     }
 
-
     private Response getFilteredEvents(@Context HttpServletRequest request) {
         EventsFilter filter = new EventsFilter(request);
         MongoDatabase database = DatabaseConnection.shared.getDatabase();
@@ -128,19 +125,8 @@ public class EventsController {
         for (Event event : results) {
             resultEvents.add(event);
         }
-        List<Event> filteredEvents = filterEvents(resultEvents, filter);
+        List<Event> filteredEvents = filter.filterEvents(resultEvents);
         return Response.ok(gson.toJson(filteredEvents)).build();
-    }
-
-    private List<Event> filterEvents(List<Event> events, EventsFilter filter) {
-        return events.stream()
-                .filter(filter.getCategoryPredicate())
-                .filter(filter.getCityPredicate())
-                .filter(filter.getFreeEntryPredicate())
-                .filter(filter.getMaxPricePredicate())
-                .filter(filter.getStartDatePredicate())
-                .filter(filter.getEndDatePredicate())
-                .collect(Collectors.toList());
     }
 
     @GET

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class EventsFilter {
     private List<String> tagIds;
@@ -37,7 +38,6 @@ public class EventsFilter {
         String maxPriceParam = request.getParameter("maxPrice");
         if (maxPriceParam != null) {
             maxPrice = Double.parseDouble(maxPriceParam);
-
         }
         String startDateParam = request.getParameter("startDate");
         if (startDateParam != null) {
@@ -49,11 +49,11 @@ public class EventsFilter {
         }
     }
 
-    public Predicate<Event> getCategoryPredicate() {
+    private Predicate<Event> getCategoryPredicate() {
         return event -> categoryIds == null || categoryIds.isEmpty() || categoryIds.contains(event.getCategoryId());
     }
 
-    public Predicate<Event> getCityPredicate() {
+    private Predicate<Event> getCityPredicate() {
         return event -> cities == null
                 || cities.isEmpty()
                 || event.getAddress() == null
@@ -61,21 +61,45 @@ public class EventsFilter {
                 || cities.contains(event.getAddress().getCity());
     }
 
-    public Predicate<Event> getFreeEntryPredicate() {
+    private Predicate<Event> getFreeEntryPredicate() {
         return event -> freeEntry == null || (!freeEntry && event.getCost() > (double) 0)
                 || (freeEntry && event.getCost().equals((double) 0));
     }
 
-    public Predicate<Event> getMaxPricePredicate() {
+    private Predicate<Event> getMaxPricePredicate() {
         return event -> maxPrice == null || event.getCost() < maxPrice;
     }
 
-    public Predicate<Event> getStartDatePredicate() {
+    private Predicate<Event> getStartDatePredicate() {
         return event -> startDate == null || event.getStartDate() < startDate;
     }
 
-    public Predicate<Event> getEndDatePredicate() {
+    private Predicate<Event> getEndDatePredicate() {
         return event -> endDate == null || event.getEndDate() < endDate;
+    }
+
+    private Predicate<Event> getTagsPredicate() {
+        return event -> tagIds == null || tagIds.isEmpty() || checkTags(event.getTagIds());
+    }
+
+    private boolean checkTags(List<String> tagIds) {
+        if (tagIds == null)
+            return false;
+        List<String> helperTagIds = new ArrayList<>(tagIds);
+        helperTagIds.retainAll(this.tagIds);
+        return !helperTagIds.isEmpty();
+    }
+
+    public List<Event> filterEvents(List<Event> events) {
+        return events.stream()
+                .filter(getCategoryPredicate())
+                .filter(getCityPredicate())
+                .filter(getFreeEntryPredicate())
+                .filter(getMaxPricePredicate())
+                .filter(getStartDatePredicate())
+                .filter(getEndDatePredicate())
+                .filter(getTagsPredicate())
+                .collect(Collectors.toList());
     }
 
 }
