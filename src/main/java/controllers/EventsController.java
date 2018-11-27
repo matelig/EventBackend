@@ -8,13 +8,11 @@ import database.DatabaseConnection;
 import database.entity.Category;
 import database.entity.Event;
 import database.entity.User;
-import helpers.Authorization;
-import helpers.GeocodingHelper;
-import helpers.KeyDecoder;
-import helpers.Parser;
+import helpers.*;
 import model.AddEventRequest;
 import model.ApiException;
 import model.EventsFilter;
+import org.apache.http.client.utils.DateUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -106,7 +104,7 @@ public class EventsController {
             return getFilteredEvents(request);
         MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Event> events = database.getCollection("Events", Event.class);
-        Long currentDateSecond = System.currentTimeMillis() / 1000;
+        Long currentDateSecond = DateHelper.getEpochTimeInSeconds();
         FindIterable<Event> results = events.find(gte("startDate", currentDateSecond));
         List<Event> resultEvents = new ArrayList<Event>();
         for (Event event : results) {
@@ -119,7 +117,7 @@ public class EventsController {
         EventsFilter filter = new EventsFilter(request);
         MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Event> events = database.getCollection("Events", Event.class);
-        Long currentDateSecond = System.currentTimeMillis() / 1000;
+        Long currentDateSecond = DateHelper.getEpochTimeInSeconds();
         FindIterable<Event> results = events.find(gte("startDate", currentDateSecond));
         List<Event> resultEvents = new ArrayList<Event>();
         for (Event event : results) {
