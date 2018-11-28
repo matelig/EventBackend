@@ -1,6 +1,7 @@
 package controllers;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -12,9 +13,7 @@ import helpers.*;
 import model.AddEventRequest;
 import model.ApiException;
 import model.EventsFilter;
-import org.apache.http.client.utils.DateUtils;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.json.*;
@@ -131,18 +130,17 @@ public class EventsController {
     @Path("/{eventId}")
     @Produces("application/json")
     public Response getEventById(@PathParam("eventId") String eventId) {
-        ObjectId eventObjectId;
-        try {
-            eventObjectId = new ObjectId(eventId);
-        } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Wrong eventId format"))).build();
-        }
         MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Event> events = database.getCollection("Events", Event.class);
-        Event event = events.find(eq("_id", eventObjectId)).first();
+        MongoCollection<User> users = database.getCollection("Users", User.class);
+        Event event = events.find(eq("_id", eventId)).first();
         if (event == null)
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Event not found"))).build();
-        return Response.ok(gson.toJson(event)).build();
+        User owner = users.find(eq("_id", event.getOwnerId())).first();
+        JsonElement eventJsonElement = gson.toJsonTree(event);
+        if (owner != null)
+            eventJsonElement.getAsJsonObject().addProperty("ownerName", owner.getNickname());
+        return Response.ok(eventJsonElement.toString()).build();
     }
 
     @GET
@@ -200,4 +198,5 @@ public class EventsController {
         json.add("ownerName", userName);
         return json.build();
     }
+
 }
