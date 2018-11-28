@@ -199,14 +199,4 @@ public class EventsController {
         return json.build();
     }
 
-    private JsonObject createEventForIdJsonResponse(Event event, String userName) {
-        JsonObjectBuilder json = Json.createObjectBuilder();
-        json.add("id", event.getId());
-        json.add("title", event.getTitle());
-        json.add("description", event.getDescription());
-        json.add("ownerId", event.getOwnerId());
-        json.add("photoUrl", event.getPhotoUrl());
-        json.add("ownerName", userName);
-        return json.build();
-    }
 }
