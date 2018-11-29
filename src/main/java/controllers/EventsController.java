@@ -196,8 +196,7 @@ public class EventsController {
         json.add("ownerId", event.getOwnerId());
         if (event.getPhotoUrl() != null)
             json.add("photoUrl", event.getPhotoUrl());
-        if (userName != null)
-            json.add("ownerName", userName);
+        json.add("ownerName", userName);
         return json.build();
     }
 
