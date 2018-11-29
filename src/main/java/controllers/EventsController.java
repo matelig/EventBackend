@@ -154,7 +154,7 @@ public class EventsController {
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("User not found"))).build();
         MongoCollection<Event> eventsCollection = database.getCollection("Events", Event.class);
         List<Event> events = new ArrayList<Event>();
-        Long inputDate = System.currentTimeMillis();
+        Long inputDate = DateHelper.getEpochTimeInSeconds();
         FindIterable<Event> results = eventsCollection.find(and(eq("ownerId", ownerId), gte("startDate", inputDate)));
         for (Event event : results)
             events.add(event);
@@ -179,7 +179,7 @@ public class EventsController {
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Category not found"))).build();
         MongoCollection<Event> eventsCollection = database.getCollection("Events", Event.class);
         JsonArrayBuilder jsonArray = Json.createArrayBuilder();
-        Long inputDate = System.currentTimeMillis();
+        Long inputDate = DateHelper.getEpochTimeInSeconds();
         FindIterable<Event> results = eventsCollection.find(and(eq("categoryId", categoryId), gte("startDate", inputDate)));
         for (Event event : results) {
             User owner = users.find(eq("_id", event.getOwnerId())).first();
@@ -194,8 +194,10 @@ public class EventsController {
         json.add("title", event.getTitle());
         json.add("description", event.getDescription());
         json.add("ownerId", event.getOwnerId());
-        json.add("photoUrl", event.getPhotoUrl());
-        json.add("ownerName", userName);
+        if (event.getPhotoUrl() != null)
+            json.add("photoUrl", event.getPhotoUrl());
+        if (userName != null)
+            json.add("ownerName", userName);
         return json.build();
     }
 
