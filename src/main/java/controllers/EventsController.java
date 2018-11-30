@@ -14,6 +14,8 @@ import model.AddEventRequest;
 import model.ApiException;
 import model.EventsFilter;
 import org.bson.Document;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.json.*;
@@ -141,6 +143,37 @@ public class EventsController {
         if (owner != null)
             eventJsonElement.getAsJsonObject().addProperty("ownerName", owner.getNickname());
         return Response.ok(eventJsonElement.toString()).build();
+    }
+
+    @PATCH
+    @Path("/update")
+    @Produces("application/json")
+    public Response updateEvent(@Context HttpServletRequest request, String jsonString) {
+        if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new ApiException("User authorization failed"))).build();
+        }
+        String email = KeyDecoder.shared.decode(request);
+        MongoDatabase database = DatabaseConnection.shared.getDatabase();
+        MongoCollection<User> users = database.getCollection("Users", User.class);
+        User existingUser = users.find(eq("email", email)).first();
+        if(existingUser == null)
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("User not found"))).build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Event updateEvent = mapper.readValue(jsonString, Event.class);
+            //Event updateEvent = createEventObject(tokenRequest);
+            MongoCollection<Event> events = database.getCollection("Events", Event.class);
+            Event existingEvent = events.find(eq("_id", updateEvent.getId())).first();
+            if(existingEvent == null)
+                return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Event not found"))).build();
+            if(!existingEvent.getOwnerId().equals(existingUser.getId()))
+                return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new ApiException("User is not owner of this event"))).build();
+            events.replaceOne(eq("_id", existingEvent.getId()), updateEvent);
+            return  Response.ok().build();
+        } catch (IOException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException(e.getMessage()))).build();
+        }
     }
 
     @GET
