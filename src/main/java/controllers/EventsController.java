@@ -162,7 +162,6 @@ public class EventsController {
         ObjectMapper mapper = new ObjectMapper();
         try {
             Event updateEvent = mapper.readValue(jsonString, Event.class);
-            //Event updateEvent = createEventObject(tokenRequest);
             MongoCollection<Event> events = database.getCollection("Events", Event.class);
             Event existingEvent = events.find(eq("_id", updateEvent.getId())).first();
             if(existingEvent == null)
