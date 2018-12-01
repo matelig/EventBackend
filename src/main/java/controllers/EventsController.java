@@ -31,13 +31,14 @@ import static com.mongodb.client.model.Filters.*;
 
 @Path("/events")
 public class EventsController {
+
     private static Gson gson = new Gson();
+    private MongoDatabase database = DatabaseConnection.shared.getDatabase();
 
     @Path("/categories")
     @GET
     @Produces("application/json")
     public JsonArray getAll() {
-        MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Document> collection = database.getCollection("Categories");
         JsonArrayBuilder builder = Json.createArrayBuilder();
         for (Document doc : collection.find()) {
@@ -53,10 +54,7 @@ public class EventsController {
         if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-        String userEmail = KeyDecoder.shared.decode(request);
-        MongoDatabase database = DatabaseConnection.shared.getDatabase();
-        MongoCollection<User> users = database.getCollection("Users", User.class);
-        User existingUser = users.find(eq("email", userEmail)).first();
+        User existingUser = Authorization.shared.getUser(request);
 
         if (existingUser == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -102,7 +100,6 @@ public class EventsController {
     public Response getAllEvents(@Context HttpServletRequest request) {
         if (!request.getParameterMap().isEmpty())
             return getFilteredEvents(request);
-        MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Event> events = database.getCollection("Events", Event.class);
         Long currentDateSecond = DateHelper.getEpochTimeInSeconds();
         FindIterable<Event> results = events.find(gte("startDate", currentDateSecond));
@@ -115,7 +112,6 @@ public class EventsController {
 
     private Response getFilteredEvents(@Context HttpServletRequest request) {
         EventsFilter filter = new EventsFilter(request);
-        MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Event> events = database.getCollection("Events", Event.class);
         Long currentDateSecond = DateHelper.getEpochTimeInSeconds();
         FindIterable<Event> results = events.find(gte("startDate", currentDateSecond));
@@ -131,7 +127,6 @@ public class EventsController {
     @Path("/{eventId}")
     @Produces("application/json")
     public Response getEventById(@PathParam("eventId") String eventId) {
-        MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Event> events = database.getCollection("Events", Event.class);
         MongoCollection<User> users = database.getCollection("Users", User.class);
         Event event = events.find(eq("_id", eventId)).first();
@@ -148,7 +143,6 @@ public class EventsController {
     @Path("/users/{ownerId}")
     @Produces("application/json")
     public Response getEventsByOwnerId(@PathParam("ownerId") String ownerId) {
-        MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<User> users = database.getCollection("Users", User.class);
         User existingUser = users.find(eq("_id", ownerId)).first();
         if (existingUser == null)
@@ -172,7 +166,6 @@ public class EventsController {
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Wrong categoryId format"))).build();
         }
-        MongoDatabase database = DatabaseConnection.shared.getDatabase();
         MongoCollection<Category> categories = database.getCollection("Categories", Category.class);
         MongoCollection<User> users = database.getCollection("Users", User.class);
         Category category = categories.find(eq("_id", categoryIdInt)).first();

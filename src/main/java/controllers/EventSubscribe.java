@@ -25,7 +25,9 @@ import static com.mongodb.client.model.Updates.set;
 
 @Path("/subscribeEvent")
 public class EventSubscribe {
+
     private static Gson gson = new Gson();
+    private MongoDatabase database = DatabaseConnection.shared.getDatabase();
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -37,10 +39,7 @@ public class EventSubscribe {
         if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-        String userEmail = KeyDecoder.shared.decode(request);
-        MongoDatabase database = DatabaseConnection.shared.getDatabase();
-        MongoCollection<User> users = database.getCollection("Users", User.class);
-        User existingUser = users.find(eq("email", userEmail)).first();
+        User existingUser = Authorization.shared.getUser(request);
 
         if (existingUser == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -77,10 +76,7 @@ public class EventSubscribe {
         if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-        String userEmail = KeyDecoder.shared.decode(request);
-        MongoDatabase database = DatabaseConnection.shared.getDatabase();
-        MongoCollection<User> users = database.getCollection("Users", User.class);
-        User existingUser = users.find(eq("email", userEmail)).first();
+        User existingUser = Authorization.shared.getUser(request);
 
         if (existingUser == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
