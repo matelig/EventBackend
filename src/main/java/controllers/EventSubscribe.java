@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
 
 @Path("/subscribeEvent")
 public class EventSubscribe {
@@ -59,9 +61,8 @@ public class EventSubscribe {
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("User currently signed up to this event."))).build();
         }
         participantsIds.add(existingUser.getId());
-        currentEvent.setParticipantsIds(participantsIds);
 
-        events.replaceOne(eq("_id", currentEvent.getId()), currentEvent);
+        events.updateOne(eq("_id", currentEvent.getId()), set("participantsIds", participantsIds));
 
         return Response.ok().build();
     }
@@ -99,9 +100,8 @@ public class EventSubscribe {
                 iter.remove();
             }
         }
-        currentEvent.setParticipantsIds(participantsIds);
 
-        events.replaceOne(eq("_id", currentEvent.getId()), currentEvent);
+        events.updateOne(eq("_id", currentEvent.getId()), set("participantsIds", participantsIds));
 
         return Response.ok().build();
     }
