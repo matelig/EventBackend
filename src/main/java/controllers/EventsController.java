@@ -23,6 +23,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -186,6 +187,76 @@ public class EventsController {
             jsonArray.add(createEventForCategoryJsonResponse(event, owner.getNickname()));
         }
         return Response.ok(jsonArray.build()).build();
+    }
+
+    @POST
+    @Path("/signUp/{eventId}")
+    @Produces("application/json")
+    public Response signUpForEvent(@PathParam("eventId") String eventId, @Context HttpServletRequest request) {
+        if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+        String userEmail = KeyDecoder.shared.decode(request);
+        MongoDatabase database = DatabaseConnection.shared.getDatabase();
+        MongoCollection<User> users = database.getCollection("Users", User.class);
+        User existingUser = users.find(eq("email", userEmail)).first();
+
+        if (existingUser == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        MongoCollection<Event> events = database.getCollection("Events", Event.class);
+        Event currentEvent = events.find(eq("_id", eventId)).first();
+
+        if (currentEvent == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Event with given ID does not exists."))).build();
+        }
+
+        List<String> participantsIds = currentEvent.getParticipantsIds();
+        if (participantsIds == null) {
+            participantsIds = new ArrayList<>();
+        }
+        if (participantsIds.contains(existingUser.getId())) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("User currently signed up to this event."))).build();
+        }
+        participantsIds.add(existingUser.getId());
+        currentEvent.setParticipantsIds(participantsIds);
+
+        events.replaceOne(eq("_id", currentEvent.getId()), currentEvent);
+
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path("/signUp/{eventId}")
+    @Produces("application/json")
+    public Response unsubscribeFromEvent(@PathParam("eventId") String eventId, @Context HttpServletRequest request) {
+        if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+        String userEmail = KeyDecoder.shared.decode(request);
+        MongoDatabase database = DatabaseConnection.shared.getDatabase();
+        MongoCollection<User> users = database.getCollection("Users", User.class);
+        User existingUser = users.find(eq("email", userEmail)).first();
+
+        if (existingUser == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        MongoCollection<Event> events = database.getCollection("Events", Event.class);
+        Event currentEvent = events.find(eq("_id", eventId)).first();
+
+        if (currentEvent == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Event with given ID does not exists."))).build();
+        }
+
+        List<String> participantsIds = currentEvent.getParticipantsIds();
+        participantsIds.removeIf(a -> a.equals(existingUser.getId()));
+        currentEvent.setParticipantsIds(participantsIds);
+
+        events.replaceOne(eq("_id", currentEvent.getId()), currentEvent);
+
+        return Response.ok().build();
     }
 
     private JsonObject createEventForCategoryJsonResponse(Event event, String userName) {
