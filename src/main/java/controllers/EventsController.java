@@ -20,6 +20,7 @@ import javax.json.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.set;
 
 @Path("/events")
 public class EventsController {
@@ -191,6 +193,82 @@ public class EventsController {
         json.add("photoUrl", event.getPhotoUrl());
         json.add("ownerName", userName);
         return json.build();
+    }
+
+    @POST
+    @Path("/{eventId}/users")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response signUpForEvent(@PathParam("eventId") String eventId, @Context HttpServletRequest request) {
+        if (eventId == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("EventId must be provided."))).build();
+        }
+
+        User existingUser = getUserFromRequest(request);
+
+        if (existingUser == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        MongoCollection<Event> events = database.getCollection("Events", Event.class);
+        Event currentEvent = events.find(eq("_id", eventId)).first();
+
+        if (currentEvent == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Event with given ID does not exists."))).build();
+        }
+
+        List<String> participantsIds = currentEvent.getParticipantsIds();
+        if (participantsIds == null) {
+            participantsIds = new ArrayList<>();
+        }
+        if (participantsIds.contains(existingUser.getId())) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("User currently signed up to this event."))).build();
+        }
+        participantsIds.add(existingUser.getId());
+
+        events.updateOne(eq("_id", currentEvent.getId()), set("participantsIds", participantsIds));
+
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path("/{eventId}/users")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response unsubscribeFromEvent(@PathParam("eventId") String eventId, @Context HttpServletRequest request) {
+        if (eventId == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("EventId must be provided."))).build();
+        }
+
+        User existingUser = getUserFromRequest(request);
+
+        if (existingUser == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        MongoCollection<Event> events = database.getCollection("Events", Event.class);
+        Event currentEvent = events.find(eq("_id", eventId)).first();
+
+        if (currentEvent == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Event with given ID does not exists."))).build();
+        }
+
+        List<String> participantsIds = currentEvent.getParticipantsIds();
+        for (Iterator<String> iter = participantsIds.listIterator(); iter.hasNext(); ) {
+            String a = iter.next();
+            if (a.equals(existingUser.getId())) {
+                iter.remove();
+            }
+        }
+
+        events.updateOne(eq("_id", currentEvent.getId()), set("participantsIds", participantsIds));
+
+        return Response.ok().build();
+    }
+
+    private User getUserFromRequest(HttpServletRequest request) {
+        if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
+            return null;
+        }
+        return Authorization.shared.getUser(request);
     }
 
 }
