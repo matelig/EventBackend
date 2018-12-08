@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
 
 @Path("/events")
 public class EventsController {
@@ -146,9 +148,9 @@ public class EventsController {
     }
 
     @PATCH
-    @Path("/update")
+    @Path("/{eventId}")
     @Produces("application/json")
-    public Response updateEvent(@Context HttpServletRequest request, String jsonString) {
+    public Response updateEvent(@PathParam("eventId") String eventId, @Context HttpServletRequest request, String jsonString) {
         if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new ApiException("User authorization failed"))).build();
         }
@@ -161,14 +163,29 @@ public class EventsController {
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            Event updateEvent = mapper.readValue(jsonString, Event.class);
+            AddEventRequest receivedEvent = mapper.readValue(jsonString, AddEventRequest.class);
+            Event updateEvent = createEventObject(receivedEvent);
             MongoCollection<Event> events = database.getCollection("Events", Event.class);
-            Event existingEvent = events.find(eq("_id", updateEvent.getId())).first();
+            Event existingEvent = events.find(eq("_id", eventId)).first();
             if(existingEvent == null)
                 return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Event not found"))).build();
             if(!existingEvent.getOwnerId().equals(existingUser.getId()))
                 return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new ApiException("User is not owner of this event"))).build();
-            events.replaceOne(eq("_id", existingEvent.getId()), updateEvent);
+            events.updateOne(eq("_id", existingEvent.getId()),
+                    combine(set("title", updateEvent.getTitle()),
+                            set("description", updateEvent.getDescription()),
+                            set("photoUrl", updateEvent.getPhotoUrl()),
+                            set("latitude", updateEvent.getLatitude()),
+                            set("longitude", updateEvent.getLongitude()),
+                            set("startDate", updateEvent.getStartDate()),
+                            set("endDate", updateEvent.getEndDate()),
+                            set("showGuestList", updateEvent.isShowGuestList()),
+                            set("maxParticipants", updateEvent.getMaxParticipants()),
+                            set("onlyRegistered", updateEvent.isOnlyRegistered()),
+                            set("categoryId", updateEvent.getCategoryId()),
+                            set("cost", updateEvent.getCost()),
+                            set("externalUrl", updateEvent.getExternalUrl()),
+                            set("address", updateEvent.getAddress())));
             return  Response.ok().build();
         } catch (IOException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException(e.getMessage()))).build();
