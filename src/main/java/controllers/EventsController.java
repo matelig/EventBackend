@@ -196,12 +196,9 @@ public class EventsController {
     }
 
     @POST
-    @Path("/{eventId}/users")
+    @Path("/{eventId}/participants")
     @Produces(MediaType.APPLICATION_JSON)
     public Response signUpForEvent(@PathParam("eventId") String eventId, @Context HttpServletRequest request) {
-        if (eventId == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("EventId must be provided."))).build();
-        }
 
         User existingUser = getUserFromRequest(request);
 
@@ -209,11 +206,10 @@ public class EventsController {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        MongoCollection<Event> events = database.getCollection("Events", Event.class);
-        Event currentEvent = events.find(eq("_id", eventId)).first();
+        Event currentEvent = getDatabaseEventById(eventId);
 
         if (currentEvent == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Event with given ID does not exists."))).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Provided event ID has bad format"))).build();
         }
 
         List<String> participantsIds = currentEvent.getParticipantsIds();
@@ -225,30 +221,25 @@ public class EventsController {
         }
         participantsIds.add(existingUser.getId());
 
-        events.updateOne(eq("_id", currentEvent.getId()), set("participantsIds", participantsIds));
+        updateParticipantsList(participantsIds, currentEvent);
 
         return Response.ok().build();
     }
 
     @DELETE
-    @Path("/{eventId}/users")
+    @Path("/{eventId}/participants")
     @Produces(MediaType.APPLICATION_JSON)
     public Response unsubscribeFromEvent(@PathParam("eventId") String eventId, @Context HttpServletRequest request) {
-        if (eventId == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("EventId must be provided."))).build();
-        }
-
         User existingUser = getUserFromRequest(request);
 
         if (existingUser == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        MongoCollection<Event> events = database.getCollection("Events", Event.class);
-        Event currentEvent = events.find(eq("_id", eventId)).first();
+        Event currentEvent = getDatabaseEventById(eventId);
 
         if (currentEvent == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Event with given ID does not exists."))).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Provided event ID has bad format"))).build();
         }
 
         List<String> participantsIds = currentEvent.getParticipantsIds();
@@ -259,7 +250,7 @@ public class EventsController {
             }
         }
 
-        events.updateOne(eq("_id", currentEvent.getId()), set("participantsIds", participantsIds));
+        updateParticipantsList(participantsIds, currentEvent);
 
         return Response.ok().build();
     }
@@ -269,6 +260,20 @@ public class EventsController {
             return null;
         }
         return Authorization.shared.getUser(request);
+    }
+
+    private Event getDatabaseEventById(String eventId) {
+        if (eventId == null) {
+            return null;
+        }
+        MongoCollection<Event> events = database.getCollection("Events", Event.class);
+
+        return events.find(eq("_id", eventId)).first();
+    }
+
+    private void updateParticipantsList(List<String> participantsIds, Event currentEvent) {
+        MongoCollection<Event> events = database.getCollection("Events", Event.class);
+        events.updateOne(eq("_id", currentEvent.getId()), set("participantsIds", participantsIds));
     }
 
 }
