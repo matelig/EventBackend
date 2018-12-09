@@ -189,6 +189,10 @@ public class EventsController {
             return  Response.ok().build();
         } catch (IOException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException(e.getMessage()))).build();
+        } catch (NumberFormatException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Wrong date format"))).build();
+        } catch (NullPointerException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("All required fields must be provided"))).build();
         }
     }
 
