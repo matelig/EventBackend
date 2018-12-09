@@ -83,14 +83,6 @@ public class Event {
         this.ownerId = ownerId;
     }
 
-    public List<String> getParticipants() {
-        return participantsIds;
-    }
-
-    public void setParticipants(List<String> participants) {
-        this.participantsIds = participants;
-    }
-
     public String getDescription() {
         return description;
     }
