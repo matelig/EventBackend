@@ -140,7 +140,7 @@ public class EventsController {
         if (owner != null)
             eventJsonElement.getAsJsonObject().addProperty("ownerName", owner.getNickname());
         if (currentUser != null) {
-            if (event.getParticipantsIds()==null) {
+            if (event.getParticipantsIds() == null) {
                 eventJsonElement.getAsJsonObject().addProperty("signed", false);
             } else {
                 eventJsonElement.getAsJsonObject().addProperty("signed", event.getParticipantsIds().contains(currentUser.getId()));
