@@ -128,7 +128,8 @@ public class EventsController {
     @GET
     @Path("/{eventId}")
     @Produces("application/json")
-    public Response getEventById(@PathParam("eventId") String eventId) {
+    public Response getEventById(@PathParam("eventId") String eventId,  @Context HttpServletRequest request) {
+        User currentUser = getUserFromRequest(request);
         MongoCollection<Event> events = database.getCollection("Events", Event.class);
         MongoCollection<User> users = database.getCollection("Users", User.class);
         Event event = events.find(eq("_id", eventId)).first();
@@ -138,6 +139,9 @@ public class EventsController {
         JsonElement eventJsonElement = gson.toJsonTree(event);
         if (owner != null)
             eventJsonElement.getAsJsonObject().addProperty("ownerName", owner.getNickname());
+        if (currentUser != null) {
+            eventJsonElement.getAsJsonObject().addProperty("signed", event.getParticipantsIds().contains(currentUser.getId()));
+        }
         return Response.ok(eventJsonElement.toString()).build();
     }
 
