@@ -9,14 +9,20 @@ import database.DatabaseConnection;
 import database.entity.Category;
 import database.entity.Event;
 import database.entity.User;
-import helpers.*;
+import helpers.Authorization;
+import helpers.DateHelper;
+import helpers.GeocodingHelper;
+import helpers.Parser;
 import model.AddEventRequest;
 import model.ApiException;
+import model.EventShortDataDto;
 import model.EventsFilter;
 import org.bson.Document;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import javax.json.*;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -105,11 +111,15 @@ public class EventsController {
         MongoCollection<Event> events = database.getCollection("Events", Event.class);
         Long currentDateSecond = DateHelper.getEpochTimeInSeconds();
         FindIterable<Event> results = events.find(gte("startDate", currentDateSecond));
-        List<Event> resultEvents = new ArrayList<Event>();
+        List<Event> resultEvents = new ArrayList<>();
         for (Event event : results) {
             resultEvents.add(event);
         }
-        return Response.ok(gson.toJson(resultEvents)).build();
+        List<EventShortDataDto> resultDtos = new ArrayList<>();
+        for (Event event : resultEvents) {
+            resultDtos.add(getShortEventDto(event, request));
+        }
+        return Response.ok(gson.toJson(resultDtos)).build();
     }
 
     private Response getFilteredEvents(@Context HttpServletRequest request) {
@@ -122,13 +132,25 @@ public class EventsController {
             resultEvents.add(event);
         }
         List<Event> filteredEvents = filter.filterEvents(resultEvents);
-        return Response.ok(gson.toJson(filteredEvents)).build();
+        List<EventShortDataDto> resultDtos = new ArrayList<>();
+        for (Event event : filteredEvents) {
+            resultDtos.add(getShortEventDto(event, request));
+        }
+        return Response.ok(gson.toJson(resultDtos)).build();
+    }
+
+    private EventShortDataDto getShortEventDto(Event event, HttpServletRequest request) {
+        User currentUser = getUserFromRequest(request);
+        boolean didUserJoin = event.getParticipantsIds() != null && currentUser != null && event.getParticipantsIds().contains(currentUser.getId());
+        MongoCollection<User> users = database.getCollection("Users", User.class);
+        User owner = users.find(eq("_id", event.getOwnerId())).first();
+        return new EventShortDataDto(event, owner.getNickname(), didUserJoin);
     }
 
     @GET
     @Path("/{eventId}")
     @Produces("application/json")
-    public Response getEventById(@PathParam("eventId") String eventId,  @Context HttpServletRequest request) {
+    public Response getEventById(@PathParam("eventId") String eventId, @Context HttpServletRequest request) {
         User currentUser = getUserFromRequest(request);
         MongoCollection<Event> events = database.getCollection("Events", Event.class);
         MongoCollection<User> users = database.getCollection("Users", User.class);
@@ -152,24 +174,25 @@ public class EventsController {
     @GET
     @Path("/users/{ownerId}")
     @Produces("application/json")
-    public Response getEventsByOwnerId(@PathParam("ownerId") String ownerId) {
+    public Response getEventsByOwnerId(@PathParam("ownerId") String ownerId, @Context HttpServletRequest request) {
         MongoCollection<User> users = database.getCollection("Users", User.class);
         User existingUser = users.find(eq("_id", ownerId)).first();
         if (existingUser == null)
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("User not found"))).build();
         MongoCollection<Event> eventsCollection = database.getCollection("Events", Event.class);
-        List<Event> events = new ArrayList<Event>();
-        Long inputDate = System.currentTimeMillis();
+        Long inputDate = DateHelper.getEpochTimeInSeconds();
         FindIterable<Event> results = eventsCollection.find(and(eq("ownerId", ownerId), gte("startDate", inputDate)));
-        for (Event event : results)
-            events.add(event);
-        return Response.ok(gson.toJson(events)).build();
+        List<EventShortDataDto> resultDtos = new ArrayList<>();
+        for (Event event : results) {
+            resultDtos.add(getShortEventDto(event, request));
+        }
+        return Response.ok(gson.toJson(resultDtos)).build();
     }
 
     @GET
     @Path("/categories/{categoryId}")
     @Produces("application/json")
-    public Response getEventsByCategoryId(@PathParam("categoryId") String categoryId) {
+    public Response getEventsByCategoryId(@PathParam("categoryId") String categoryId, @Context HttpServletRequest request) {
         int categoryIdInt;
         try {
             categoryIdInt = Integer.parseInt(categoryId);
@@ -177,30 +200,17 @@ public class EventsController {
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Wrong categoryId format"))).build();
         }
         MongoCollection<Category> categories = database.getCollection("Categories", Category.class);
-        MongoCollection<User> users = database.getCollection("Users", User.class);
         Category category = categories.find(eq("_id", categoryIdInt)).first();
         if (category == null)
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Category not found"))).build();
         MongoCollection<Event> eventsCollection = database.getCollection("Events", Event.class);
-        JsonArrayBuilder jsonArray = Json.createArrayBuilder();
-        Long inputDate = System.currentTimeMillis();
+        Long inputDate = DateHelper.getEpochTimeInSeconds();
         FindIterable<Event> results = eventsCollection.find(and(eq("categoryId", categoryId), gte("startDate", inputDate)));
+        List<EventShortDataDto> resultDtos = new ArrayList<>();
         for (Event event : results) {
-            User owner = users.find(eq("_id", event.getOwnerId())).first();
-            jsonArray.add(createEventForCategoryJsonResponse(event, owner.getNickname()));
+            resultDtos.add(getShortEventDto(event, request));
         }
-        return Response.ok(jsonArray.build()).build();
-    }
-
-    private JsonObject createEventForCategoryJsonResponse(Event event, String userName) {
-        JsonObjectBuilder json = Json.createObjectBuilder();
-        json.add("id", event.getId());
-        json.add("title", event.getTitle());
-        json.add("description", event.getDescription());
-        json.add("ownerId", event.getOwnerId());
-        json.add("photoUrl", event.getPhotoUrl());
-        json.add("ownerName", userName);
-        return json.build();
+        return Response.ok(gson.toJson(resultDtos)).build();
     }
 
     @POST
