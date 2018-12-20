@@ -9,10 +9,7 @@ import database.DatabaseConnection;
 import database.entity.Category;
 import database.entity.Event;
 import database.entity.User;
-import helpers.Authorization;
-import helpers.DateHelper;
-import helpers.GeocodingHelper;
-import helpers.Parser;
+import helpers.*;
 import model.AddEventRequest;
 import model.ApiException;
 import model.EventShortDataDto;
@@ -35,6 +32,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 
 @Path("/events")
@@ -171,6 +169,55 @@ public class EventsController {
         return Response.ok(eventJsonElement.toString()).build();
     }
 
+    @PATCH
+    @Path("/{eventId}")
+    @Produces("application/json")
+    public Response updateEvent(@PathParam("eventId") String eventId, @Context HttpServletRequest request, String jsonString) {
+        if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new ApiException("User authorization failed"))).build();
+        }
+        String email = KeyDecoder.shared.decode(request);
+        MongoDatabase database = DatabaseConnection.shared.getDatabase();
+        MongoCollection<User> users = database.getCollection("Users", User.class);
+        User existingUser = users.find(eq("email", email)).first();
+        if(existingUser == null)
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("User not found"))).build();
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            AddEventRequest receivedEvent = mapper.readValue(jsonString, AddEventRequest.class);
+            Event updateEvent = createEventObject(receivedEvent);
+            MongoCollection<Event> events = database.getCollection("Events", Event.class);
+            Event existingEvent = events.find(eq("_id", eventId)).first();
+            if(existingEvent == null)
+                return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Event not found"))).build();
+            if(!existingEvent.getOwnerId().equals(existingUser.getId()))
+                return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new ApiException("User is not owner of this event"))).build();
+            events.updateOne(eq("_id", existingEvent.getId()),
+                    combine(set("title", updateEvent.getTitle()),
+                            set("description", updateEvent.getDescription()),
+                            set("photoUrl", updateEvent.getPhotoUrl()),
+                            set("latitude", updateEvent.getLatitude()),
+                            set("longitude", updateEvent.getLongitude()),
+                            set("startDate", updateEvent.getStartDate()),
+                            set("endDate", updateEvent.getEndDate()),
+                            set("showGuestList", updateEvent.isShowGuestList()),
+                            set("maxParticipants", updateEvent.getMaxParticipants()),
+                            set("onlyRegistered", updateEvent.isOnlyRegistered()),
+                            set("categoryId", updateEvent.getCategoryId()),
+                            set("cost", updateEvent.getCost()),
+                            set("externalUrl", updateEvent.getExternalUrl()),
+                            set("address", updateEvent.getAddress())));
+            return  Response.ok().build();
+        } catch (IOException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException(e.getMessage()))).build();
+        } catch (NumberFormatException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Wrong date format"))).build();
+        } catch (NullPointerException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("All required fields must be provided"))).build();
+        }
+    }
+
     @GET
     @Path("/users/{ownerId}")
     @Produces("application/json")
@@ -241,7 +288,7 @@ public class EventsController {
 
         updateParticipantsList(participantsIds, currentEvent);
 
-        return Response.ok().build();
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @DELETE
@@ -270,7 +317,7 @@ public class EventsController {
 
         updateParticipantsList(participantsIds, currentEvent);
 
-        return Response.ok().build();
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     private User getUserFromRequest(HttpServletRequest request) {
