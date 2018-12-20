@@ -11,6 +11,8 @@ import model.ApiException;
 import model.EventsMapRequest;
 import model.TokenRequest;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.w3c.dom.ranges.Range;
+import org.w3c.dom.ranges.RangeException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -51,12 +53,14 @@ public class MapController {
                 }
             }
             return Response.ok(gson.toJson(eventsInRadius)).build();
-        } catch (IOException e) {
+        } catch (IOException | RangeException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException(e.getMessage()))).build();
         }
     }
 
-    private double distanceBetweenTwoPoints(double lat1, double lon1, double lat2, double lon2) {
+    private double distanceBetweenTwoPoints(double lat1, double lon1, double lat2, double lon2) throws RangeException {
+        if(lat1>90 || lat1<-90 || lon1>180 || lon1<-180 || lat2>90 || lat2<-90 || lon2>180 || lon2<-180 )
+            throw new RangeException((short)-1, "Coordinates have wrong range");
         lat1 = Math.toRadians(lat1);
         lon1 = Math.toRadians(lon1);
         lat2 = Math.toRadians(lat2);
