@@ -1,6 +1,7 @@
 package controllers;
 
 import com.google.gson.Gson;
+import model.ApiException;
 import model.UserAgreementResponse;
 
 import javax.ws.rs.GET;
@@ -25,8 +26,7 @@ public class AgreementsController {
                 line = br.readLine();
             }
         } catch (Exception e) {
-            //todo change to ApiException
-            return Response.status(Response.Status.NOT_FOUND).entity(new Gson().toJson("File not found")).build();
+            return Response.status(Response.Status.NOT_FOUND).entity(new Gson().toJson(new ApiException("File not found"))).build();
         }
         UserAgreementResponse response = new UserAgreementResponse(fileContent.toString());
         return Response.ok(new Gson().toJson(response)).build();

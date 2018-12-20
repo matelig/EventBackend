@@ -1,5 +1,9 @@
 package helpers;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import database.DatabaseConnection;
+import database.entity.User;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +15,8 @@ import javax.ws.rs.core.Response;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import static com.mongodb.client.model.Filters.eq;
 
 public class Authorization {
 
@@ -38,6 +44,13 @@ public class Authorization {
             e.printStackTrace();
         }
         return Response.Status.UNAUTHORIZED;
+    }
+
+    public User getUser(HttpServletRequest request) {
+        String userEmail = KeyDecoder.shared.decode(request);
+        MongoDatabase database = DatabaseConnection.shared.getDatabase();
+        MongoCollection<User> users = database.getCollection("Users", User.class);
+        return users.find(eq("email", userEmail)).first();
     }
 
 }
