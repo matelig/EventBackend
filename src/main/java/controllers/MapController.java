@@ -48,7 +48,7 @@ public class MapController {
             for(Event e : results) {
                 if (eventsMapRequest.getRadius() > distanceBetweenTwoPoints(eventsMapRequest.getLatitude(),
                         eventsMapRequest.getLongitude(), e.getLatitude(), e.getLongitude())) {
-                    EventMapData data = new EventMapData(e.getId(), e.getLongitude(), e.getLatitude(), e.getTitle(), e.getPhotoUrl());
+                    EventMapData data = new EventMapData(e.getId(), e.getLongitude(), e.getLatitude(), e.getTitle());
                     eventsInRadius.add(data);
                 }
             }
@@ -75,14 +75,12 @@ public class MapController {
         private double longitude;
         private double latitude;
         private String name;
-        private String photoUrl;
 
-        public EventMapData(String id, double longitude, double latitude, String name, String photoUrl) {
+        public EventMapData(String id, double longitude, double latitude, String name) {
             this.id = id;
             this.longitude = longitude;
             this.latitude = latitude;
             this.name = name;
-            this.photoUrl = photoUrl;
         }
     }
 }
