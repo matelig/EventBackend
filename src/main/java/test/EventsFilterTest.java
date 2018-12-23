@@ -18,13 +18,13 @@ public class EventsFilterTest {
         //given
         List<Event> events = new ArrayList<>();
         Event eventWithTag1And2 = new Event();
-        eventWithTag1And2.setTagIds(Arrays.asList("1", "2"));
+        eventWithTag1And2.setTags(Arrays.asList("1", "2"));
         Event eventWithTag1 = new Event();
-        eventWithTag1.setTagIds(Arrays.asList("1"));
+        eventWithTag1.setTags(Arrays.asList("1"));
         Event eventWithTag4 = new Event();
-        eventWithTag4.setTagIds(Arrays.asList("4"));
+        eventWithTag4.setTags(Arrays.asList("4"));
         Event eventWithTag2 = new Event();
-        eventWithTag2.setTagIds(Arrays.asList("2"));
+        eventWithTag2.setTags(Arrays.asList("2"));
         Event eventWithoutTag = new Event();
 
         events.add(eventWithTag1);
@@ -55,13 +55,13 @@ public class EventsFilterTest {
         //given
         List<Event> events = new ArrayList<>();
         Event eventWithTag1And2 = new Event();
-        eventWithTag1And2.setTagIds(Arrays.asList("1", "2"));
+        eventWithTag1And2.setTags(Arrays.asList("1", "2"));
         Event eventWithTag1 = new Event();
-        eventWithTag1.setTagIds(Arrays.asList("1"));
+        eventWithTag1.setTags(Arrays.asList("1"));
         Event eventWithTag4 = new Event();
-        eventWithTag4.setTagIds(Arrays.asList("4"));
+        eventWithTag4.setTags(Arrays.asList("4"));
         Event eventWithTag2 = new Event();
-        eventWithTag2.setTagIds(Arrays.asList("2"));
+        eventWithTag2.setTags(Arrays.asList("2"));
         Event eventWithoutTag = new Event();
 
         events.add(eventWithTag1);
@@ -92,13 +92,13 @@ public class EventsFilterTest {
         //given
         List<Event> events = new ArrayList<>();
         Event eventWithTag1And2 = new Event();
-        eventWithTag1And2.setTagIds(Arrays.asList("1", "2"));
+        eventWithTag1And2.setTags(Arrays.asList("1", "2"));
         Event eventWithTag1 = new Event();
-        eventWithTag1.setTagIds(Arrays.asList("1"));
+        eventWithTag1.setTags(Arrays.asList("1"));
         Event eventWithTag4 = new Event();
-        eventWithTag4.setTagIds(Arrays.asList("4"));
+        eventWithTag4.setTags(Arrays.asList("4"));
         Event eventWithTag2 = new Event();
-        eventWithTag2.setTagIds(Arrays.asList("2"));
+        eventWithTag2.setTags(Arrays.asList("2"));
         Event eventWithoutTag = new Event();
 
         events.add(eventWithTag1);
@@ -128,13 +128,13 @@ public class EventsFilterTest {
         //given
         List<Event> events = new ArrayList<>();
         Event eventWithTag1And2 = new Event();
-        eventWithTag1And2.setTagIds(Arrays.asList("1", "2"));
+        eventWithTag1And2.setTags(Arrays.asList("1", "2"));
         Event eventWithTag1 = new Event();
-        eventWithTag1.setTagIds(Arrays.asList("1"));
+        eventWithTag1.setTags(Arrays.asList("1"));
         Event eventWithTag4 = new Event();
-        eventWithTag4.setTagIds(Arrays.asList("4"));
+        eventWithTag4.setTags(Arrays.asList("4"));
         Event eventWithTag2 = new Event();
-        eventWithTag2.setTagIds(Arrays.asList("2"));
+        eventWithTag2.setTags(Arrays.asList("2"));
         Event eventWithoutTag = new Event();
 
         events.add(eventWithTag1);
