@@ -89,6 +89,8 @@ public class EventsController {
                 Boolean.getBoolean(addEventRequest.isOnlyRegistered()), addEventRequest.getCategoryId(),
                 Double.parseDouble(addEventRequest.getCost()), addEventRequest.getExternalUrl());
 
+        newEvent.setTags(addEventRequest.getTags());
+
         Long startDate = Long.parseLong(addEventRequest.getStartDate());
         newEvent.setStartDate(startDate);
 

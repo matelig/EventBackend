@@ -17,7 +17,7 @@ public class Event {
     private int maxParticipants;
     private boolean onlyRegistered;
     private String categoryId;
-    private List<String> tagIds;
+    private List<String> tags;
     private Double cost;
     private String externalUrl;
     private Address address;
@@ -67,12 +67,12 @@ public class Event {
         this.participantsIds = participantsIds;
     }
 
-    public List<String> getTagIds() {
-        return tagIds;
+    public List<String> getTags() {
+        return tags;
     }
 
-    public void setTagIds(List<String> tagIds) {
-        this.tagIds = tagIds;
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     public String getOwnerId() {

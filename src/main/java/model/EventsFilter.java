@@ -79,7 +79,7 @@ public class EventsFilter {
     }
 
     private Predicate<Event> getTagsPredicate() {
-        return event -> tagIds == null || tagIds.isEmpty() || checkTags(event.getTagIds());
+        return event -> tagIds == null || tagIds.isEmpty() || checkTags(event.getTags());
     }
 
     private boolean checkTags(List<String> tagIds) {

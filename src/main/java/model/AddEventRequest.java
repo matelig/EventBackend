@@ -3,6 +3,7 @@ package model;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.Date;
+import java.util.List;
 
 public class AddEventRequest {
     @JsonProperty(value = "name")
@@ -31,6 +32,8 @@ public class AddEventRequest {
     private String cost;
     @JsonProperty(value = "photoUrl")
     private String photoUrl;
+    @JsonProperty(value = "tags")
+    private List<String> tags;
 
     public String getName() {
         return name;
@@ -142,5 +145,13 @@ public class AddEventRequest {
 
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 }
