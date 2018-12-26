@@ -4,9 +4,13 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import database.DatabaseConnection;
 import database.entity.Category;
+import services.EmailBackgroundTask;
 
 import javax.ws.rs.ApplicationPath;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @ApplicationPath("/api")
 public class Application extends javax.ws.rs.core.Application {
@@ -16,6 +20,7 @@ public class Application extends javax.ws.rs.core.Application {
 
     public Application() {
         initCategories();
+        initEventScheduler();
     }
 
     private void initCategories() {
@@ -27,6 +32,17 @@ public class Application extends javax.ws.rs.core.Application {
                 categoryMongoCollection.insertOne(category);
             }
         }
+    }
+
+    private void initEventScheduler() {
+        System.out.println("scheduler init");
+        ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+        ses.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                EmailBackgroundTask.shared.sendReminders();
+            }
+        }, 0, 1, TimeUnit.MINUTES);
     }
 }
 
