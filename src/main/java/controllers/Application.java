@@ -42,7 +42,7 @@ public class Application extends javax.ws.rs.core.Application {
             public void run() {
                 EmailBackgroundTask.shared.sendReminders();
             }
-        }, 0, 1, TimeUnit.MINUTES);
+        }, 0, 1, TimeUnit.HOURS);
     }
 }
 
