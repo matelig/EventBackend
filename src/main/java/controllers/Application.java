@@ -17,6 +17,8 @@ public class Application extends javax.ws.rs.core.Application {
 
     private String[] categories = {"Sport", "Szkolenia", "Koncerty", "Film", "Konferencje", "Teatr", "Literatura", "Kulinaria",
             "Taniec", "Turystyka", "Motoryzacja", "Biegi", "Gry zespołowe", "Inne"};
+    private int eventSchedulerDelay = 0;
+    private int eventSchedulerPeriod = 1;
 
     public Application() {
         initCategories();
@@ -42,7 +44,7 @@ public class Application extends javax.ws.rs.core.Application {
             public void run() {
                 EmailBackgroundTask.shared.sendReminders();
             }
-        }, 0, 1, TimeUnit.HOURS);
+        }, eventSchedulerDelay, eventSchedulerPeriod, TimeUnit.HOURS);
     }
 }
 

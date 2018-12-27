@@ -100,6 +100,7 @@ public class EventsController {
                 Double.parseDouble(addEventRequest.getLongitude())));
         newEvent.setPhotoUrl(addEventRequest.getPhotoUrl());
         newEvent.setId(UUID.randomUUID().toString());
+        newEvent.setReminderSend(false);
         return newEvent;
     }
 
