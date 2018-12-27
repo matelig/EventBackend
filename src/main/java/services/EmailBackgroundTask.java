@@ -64,20 +64,20 @@ public class EmailBackgroundTask {
         Date date = new Date(startDate*1000);
         EmailReminder er = new EmailReminder();
         er.setRecipient(userEmail);
-        er.setSubject("EventMap - nadchodzące wydarzenie");
-        String message = "Zapisałeś się na wydarzenie " + eventName + "\n";
-        message += "Przypominamy, wydarzenie odbędzie się dnia " + dateFormatter.format(date) + " o godzinie " + timeFormatter.format(date) + "\n";
+        er.setSubject("EventMap - incoming event");
+        String message = "You had sign up to incoming event " + eventName + "\n";
+        message += "We remind you, the event will take place on " + dateFormatter.format(date) + " at " + timeFormatter.format(date) + "\n";
         if (addressExists(address)) {
             message += createAddressMessage(address);
         }
-        message += "Po więcej szczegółów zapraszamy na: <LINK>";
+        message += "For more details, please visit: <LINK>";
         //TODO: link to event on our server
         er.setMessage(message);
         return er;
     }
 
     private String createAddressMessage(Address address) {
-        String message = "Wydarzenie odbędzie się w " + address.getCountry() + ", " + address.getCity() + "\n";
+        String message = "This event will take place in " + address.getCountry() + ", " + address.getCity() + "\n";
         return message;
     }
 
