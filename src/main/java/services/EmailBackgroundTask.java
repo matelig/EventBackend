@@ -22,7 +22,7 @@ public class EmailBackgroundTask {
 
     public static EmailBackgroundTask shared = new EmailBackgroundTask();
 
-    private Long hours_24 = 24*60*60L; //TODO: discuss about time
+    private Long hours_24 = 24*60*60*1000L;
 
     private MongoDatabase database = DatabaseConnection.shared.getDatabase();
     private DateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyy");
@@ -61,7 +61,7 @@ public class EmailBackgroundTask {
     }
 
     private EmailReminder createEventModel(String eventName, Long startDate, String userEmail, Address address) {
-        Date date = new Date(startDate*1000);
+        Date date = new Date(startDate);
         EmailReminder er = new EmailReminder();
         er.setRecipient(userEmail);
         er.setSubject("EventMap - incoming event");
