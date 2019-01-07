@@ -74,6 +74,8 @@ public class AuthEndpoint {
             json.add("refresh_token", oauthResponse.getRefreshToken());
             json.add("expires_in", oauthResponse.getExpiresIn());
             json.add("token_type", oauthResponse.getTokenType());
+            json.add("user_id", existingUser.getId());
+            json.add("user_nickname", existingUser.getNickname());
             return Response.ok(json.build(), MediaType.APPLICATION_JSON).build();
         } catch (OAuthSystemException var4) {
             var4.printStackTrace();
