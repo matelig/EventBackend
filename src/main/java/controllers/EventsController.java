@@ -209,7 +209,8 @@ public class EventsController {
                             set("categoryId", updateEvent.getCategoryId()),
                             set("cost", updateEvent.getCost()),
                             set("externalUrl", updateEvent.getExternalUrl()),
-                            set("address", updateEvent.getAddress())));
+                            set("address", updateEvent.getAddress()),
+                            set("tags", updateEvent.getTags())));
             return  Response.ok().build();
         } catch (IOException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException(e.getMessage()))).build();
