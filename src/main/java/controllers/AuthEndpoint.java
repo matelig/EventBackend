@@ -7,6 +7,7 @@ import database.DatabaseConnection;
 import database.entity.User;
 import helpers.Config;
 import model.ApiException;
+import model.SocialAuthRequest;
 import model.TokenRequest;
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
@@ -25,13 +26,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.UUID;
 
-import static com.mongodb.client.model.Filters.and;
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
 
 @Path("/authorization")
 public class AuthEndpoint {
     private static final Gson gson = new Gson();
+    MongoDatabase database = DatabaseConnection.shared.getDatabase();
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -47,10 +49,64 @@ public class AuthEndpoint {
         }
     }
 
+    @POST
+    @Path("/social")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response socialToken(String socialRequestString) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        SocialAuthRequest socialAuthRequest = mapper.readValue(socialRequestString, SocialAuthRequest.class);
+
+        MongoCollection<User> users = database.getCollection("Users", User.class);
+        User existingUser = users.find(eq("email", socialAuthRequest.getEmail())).first();
+        if (existingUser == null) {
+            User newUser = new User(socialAuthRequest.getEmail(), socialAuthRequest.getName(), "", socialAuthRequest.getClientId());
+            newUser.setId(UUID.randomUUID().toString());
+            users.insertOne(newUser);
+        }
+
+        existingUser = users.find(eq("email", socialAuthRequest.getEmail())).first();
+
+        if (existingUser == null || existingUser.getUserId() == null || existingUser.getUserId().equals("")) {
+            return Response.status(Response.Status.CONFLICT).entity(gson.toJson(new ApiException("Email registered to other user"))).build();
+        }
+
+        OAuthClientRequest request = null;
+        try {
+            request = OAuthClientRequest.tokenLocation(
+                    Config.authorizationUrl + "accessToken")
+                    .setGrantType(GrantType.PASSWORD)
+                    .setClientId(socialAuthRequest.getClientId())
+                    .setClientSecret(socialAuthRequest.getClientSecret())
+                    .setUsername(existingUser.getEmail())
+                    .setPassword(existingUser.getUserId()).buildBodyMessage();
+        } catch (OAuthSystemException e) {
+            e.printStackTrace();
+        }
+        OAuthClient oAuthClient = new OAuthClient(new URLConnectionClient());
+        OAuthAccessTokenResponse oauthResponse = null;
+        try {
+            oauthResponse = oAuthClient.accessToken(request);
+        } catch (OAuthSystemException e) {
+            e.printStackTrace();
+        } catch (OAuthProblemException e) {
+            e.printStackTrace();
+        }
+        System.out.println(oauthResponse.getAccessToken());
+        System.out.println(oauthResponse.getExpiresIn());
+        JsonObjectBuilder json = Json.createObjectBuilder();
+        json.add("access_token", oauthResponse.getAccessToken());
+        json.add("refresh_token", oauthResponse.getRefreshToken());
+        json.add("expires_in", oauthResponse.getExpiresIn());
+        json.add("token_type", oauthResponse.getTokenType());
+        json.add("user_id", existingUser.getId());
+        json.add("user_nickname", existingUser.getNickname());
+        return Response.ok(json.build(), MediaType.APPLICATION_JSON).build();
+
+    }
+
     private Response returnAccessTokenResponse(TokenRequest tokenRequest) {
         try {
 
-            MongoDatabase database = DatabaseConnection.shared.getDatabase();
             MongoCollection<User> users = database.getCollection("Users", User.class);
 
             User existingUser = users.find(and(eq("email", tokenRequest.getEmail()), eq("password", tokenRequest.getPassword()))).first();
