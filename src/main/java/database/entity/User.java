@@ -6,15 +6,13 @@ public class User {
     private String email;
     private String nickname;
     private String password;
-    private String userId;
 
     public User() { }
 
-    public User(String email, String nickname, String password, String userId) {
+    public User(String email, String nickname, String password) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
-        this.userId = userId;
     }
 
     public String getId() {
@@ -47,13 +45,5 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 }
