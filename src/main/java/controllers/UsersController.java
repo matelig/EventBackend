@@ -62,8 +62,10 @@ public class UsersController {
     @DELETE
     @Produces("application/json")
     public Response deleteUser(@Context HttpServletRequest request) {
-        //TODO: remove token
         if (Authorization.shared.isAuthenticated(request).getStatusCode() != 200) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new ApiException("User authorization failed"))).build();
+        }
+        if (Authorization.shared.removeTokens(request).getStatusCode() != 200) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new ApiException("User authorization failed"))).build();
         }
         MongoCollection<Event> events = database.getCollection("Events", Event.class);
