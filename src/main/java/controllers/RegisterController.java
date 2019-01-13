@@ -49,7 +49,7 @@ public class RegisterController {
             if (existingUser != null) {
                 return Response.status(Response.Status.CONFLICT).entity(gson.toJson(new ApiException("User already exists"))).build();
             }
-            User newUser = new User(tokenRequest.getEmail(), tokenRequest.getNickname(), tokenRequest.getPassword());
+            User newUser = new User(tokenRequest.getEmail(), tokenRequest.getNickname(), tokenRequest.getPassword(), "");
             newUser.setId(UUID.randomUUID().toString());
             users.insertOne(newUser);
         } catch (IOException e) {
