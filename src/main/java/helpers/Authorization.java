@@ -46,6 +46,23 @@ public class Authorization {
         return Response.Status.UNAUTHORIZED;
     }
 
+    public Response.Status removeTokens(@Context HttpServletRequest request) {
+        try {
+            URL restURL = new URL(Config.authorizationUrl + "remove/accessToken");
+            Client client = JerseyClientBuilder.newClient();
+            WebTarget target = client.target(restURL.toURI());
+            Response entity = target.request(MediaType.TEXT_HTML)
+                    .header("Authorization", request.getHeader("Authorization"))
+                    .get(Response.class);
+            return Response.Status.fromStatusCode(entity.getStatus());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return Response.Status.UNAUTHORIZED;
+    }
+
     public User getUser(HttpServletRequest request) {
         String userEmail = KeyDecoder.shared.decode(request);
         MongoDatabase database = DatabaseConnection.shared.getDatabase();
