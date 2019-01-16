@@ -26,10 +26,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.combine;
@@ -146,6 +143,39 @@ public class EventsController {
         MongoCollection<User> users = database.getCollection("Users", User.class);
         User owner = users.find(eq("_id", event.getOwnerId())).first();
         return new EventShortDataDto(event, owner.getNickname(), didUserJoin);
+    }
+
+    @GET
+    @Path("/popular")
+    public Response getMostPopularEvents(@Context HttpServletRequest request) {
+        MongoCollection<Event> events = database.getCollection("Events", Event.class);
+        MongoCollection<User> users = database.getCollection("Users", User.class);
+        Long currentDateSecond = DateHelper.getEpochTimeInSeconds();
+        FindIterable<Event> results = events.find(gte("startDate", currentDateSecond));
+        Map<String, Integer> eventsMap = new HashMap<>();
+        for (Event event: results) {
+            List<String> participants = event.getParticipantsIds();
+            if (participants != null) {
+                eventsMap.put(event.getId(), participants.size());
+            }
+        }
+        eventsMap = MapUtil.sortByValue(eventsMap);
+        List<EventShortDataDto> resultDtos = new ArrayList<>();
+        int i = 0;
+        for(Map.Entry<String, Integer> entry : eventsMap.entrySet()) {
+            String key = entry.getKey();
+            Event existingEvent = events.find(eq("_id", key)).first();
+            if (existingEvent!=null) {
+                User owner = users.find(eq("_id", existingEvent.getOwnerId())).first();
+                EventShortDataDto esdd = new EventShortDataDto(existingEvent, owner.getNickname(), false);
+                resultDtos.add(esdd);
+                i++;
+            }
+            if(i == 10) {
+                break;
+            }
+        }
+        return Response.ok(gson.toJson(resultDtos)).build();
     }
 
     @GET
