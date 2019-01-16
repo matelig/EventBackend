@@ -15,10 +15,10 @@ import java.util.concurrent.TimeUnit;
 @ApplicationPath("/api")
 public class Application extends javax.ws.rs.core.Application {
 
-    private String[] categories = {"Sport", "Szkolenia", "Koncerty", "Film", "Konferencje", "Teatr", "Literatura", "Kulinaria",
-            "Taniec", "Turystyka", "Motoryzacja", "Biegi", "Gry zespołowe", "Inne"};
     private int eventSchedulerDelay = 0;
     private int eventSchedulerPeriod = 1;
+    private String[] categories = {"Sport", "Trainings", "Concerts", "Film", "Conferences", "Theater", "Literature", "Culinary",
+            "Dance", "Tourism", "Motoring", "Racing", "Team games", "Others"};
 
     public Application() {
         initCategories();
