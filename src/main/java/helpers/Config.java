@@ -15,4 +15,7 @@ public class Config {
     public static String databaseAdminName = "admin";
     public static Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     public static String geocodingApiKey = "9ae4702d5beb4db48ebaf98a3d849341";
+    public static String emailSender = "event.backend.reminder@gmail.com";
+    public static String emailUsername = "event.backend.reminder";
+    public static String emailPassword = "zgadnij123";
 }

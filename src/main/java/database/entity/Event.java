@@ -21,6 +21,7 @@ public class Event {
     private Double cost;
     private String externalUrl;
     private Address address;
+    private boolean reminderSend;
 
     public Event(String title, String description, Long startDate, boolean showGuestList,
                  int maxParticipants, boolean onlyRegistered, String categoryId, Double cost, String externalUrl) {
@@ -193,5 +194,13 @@ public class Event {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public boolean isReminderSend() {
+        return reminderSend;
+    }
+
+    public void setReminderSend(boolean reminderSend) {
+        this.reminderSend = reminderSend;
     }
 }
