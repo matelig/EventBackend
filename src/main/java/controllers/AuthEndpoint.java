@@ -5,6 +5,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import database.DatabaseConnection;
 import database.entity.User;
+import helpers.Authorization;
 import helpers.Config;
 import model.ApiException;
 import model.SocialAuthRequest;
@@ -20,9 +21,11 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -47,6 +50,15 @@ public class AuthEndpoint {
         } else {
             return Response.status(Response.Status.NOT_ACCEPTABLE).entity(gson.toJson(new ApiException("Wrong grant type"))).build();
         }
+    }
+
+    @POST
+    @Path("/logout")
+    public Response logout(@Context HttpServletRequest request) {
+        if (Authorization.shared.removeTokens(request).getStatusCode() != 200) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(gson.toJson(new ApiException("User authorization failed"))).build();
+        }
+        return Response.ok().build();
     }
 
     @POST
