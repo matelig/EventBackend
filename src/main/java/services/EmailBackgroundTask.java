@@ -45,7 +45,7 @@ public class EmailBackgroundTask {
                 for (String userId : event.getParticipantsIds()) {
                     User user = users.find(eq("_id", userId)).first();
                     if (user != null) {
-                        EmailReminder er = createEventModel(event.getTitle(), event.getStartDate(), user.getEmail(), event.getAddress());
+                        EmailReminder er = createEventModel(event.getTitle(), event.getStartDate(), user.getEmail(), event.getAddress(), event.getId());
                         System.out.println("Email - Sending message");
                         boolean send = EmailSender.shared.send(er);
                         if (send) {
@@ -60,19 +60,17 @@ public class EmailBackgroundTask {
         System.out.println("Email scheduler end work");
     }
 
-    private EmailReminder createEventModel(String eventName, Long startDate, String userEmail, Address address) {
+    private EmailReminder createEventModel(String eventName, Long startDate, String userEmail, Address address, String eventId) {
         Date date = new Date(startDate);
-        EmailReminder er = new EmailReminder();
-        er.setRecipient(userEmail);
-        er.setSubject("EventMap - incoming event");
+        String subject = "EventMap - incoming event";
         String message = "You had sign up to incoming event " + eventName + "\n";
         message += "We remind you, the event will take place on " + dateFormatter.format(date) + " at " + timeFormatter.format(date) + "\n";
         if (addressExists(address)) {
             message += createAddressMessage(address);
         }
-        message += "For more details, please visit: <LINK>";
+        message += "For more details, please visit: https://event-map-pro.herokuapp.com/events/" + eventId;
         //TODO: link to event on our server
-        er.setMessage(message);
+        EmailReminder er = new EmailReminder(userEmail, subject, message);
         return er;
     }
 
