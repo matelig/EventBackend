@@ -10,10 +10,7 @@ import database.entity.Category;
 import database.entity.Event;
 import database.entity.User;
 import helpers.*;
-import model.AddEventRequest;
-import model.ApiException;
-import model.EventShortDataDto;
-import model.EventsFilter;
+import model.*;
 import org.bson.Document;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -292,6 +289,34 @@ public class EventsController {
             resultDtos.add(getShortEventDto(event, request));
         }
         return Response.ok(gson.toJson(resultDtos)).build();
+    }
+
+    @GET
+    @Path("/{eventId}/participants")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getParticipantsList(@PathParam("eventId") String eventId, @Context HttpServletRequest request) {
+
+        Event currentEvent = getDatabaseEventById(eventId);
+        MongoCollection<User> users = database.getCollection("Users", User.class);
+
+        if (currentEvent == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(gson.toJson(new ApiException("Provided event ID has bad format"))).build();
+        }
+
+        List<String> participantsIds = currentEvent.getParticipantsIds();
+        if (participantsIds == null) {
+            participantsIds = new ArrayList<>();
+        }
+
+        List<UserShortDto> userShortDtoList = new ArrayList<>();
+        for (String userId: participantsIds) {
+            User existingUser = users.find(eq("_id", userId)).first();
+            if (existingUser != null) {
+                UserShortDto userShortDto = new UserShortDto(existingUser.getId(), existingUser.getEmail(), existingUser.getNickname());
+                userShortDtoList.add(userShortDto);
+            }
+        }
+        return Response.ok(gson.toJson(userShortDtoList)).build();
     }
 
     @POST
