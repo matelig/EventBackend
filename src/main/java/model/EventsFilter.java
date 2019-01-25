@@ -71,7 +71,7 @@ public class EventsFilter {
     }
 
     private Predicate<Event> getStartDatePredicate() {
-        return event -> startDate == null || event.getStartDate() < startDate;
+        return event -> startDate == null || event.getStartDate() > startDate;
     }
 
     private Predicate<Event> getEndDatePredicate() {
